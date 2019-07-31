@@ -1,6 +1,7 @@
 # Output and generated files
 node_modules/
 yarn.lock
+coverage
 *.log
 dist
 
