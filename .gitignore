@@ -1,0 +1,12 @@
+# Output and generated files
+node_modules/
+yarn.lock
+*.log
+dist
+
+# IDEs and editors
+.vscode
+.idea
+
+# System generated
+.DS_Store
