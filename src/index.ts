@@ -1,3 +1,7 @@
-export function sum(a: number, b: number): number {
-    return a + b;
+import sodium from 'libsodium-wrappers-sumo';
+
+export * from './crypto';
+
+export async function init(): Promise<void> {
+  await sodium.ready;
 }

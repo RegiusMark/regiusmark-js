@@ -4,13 +4,17 @@
     "sourceMap": true,
     "declaration": true,
     "esModuleInterop": true,
-    "module": "es6",
+    "module": "commonjs",
     "target": "es5",
     "strict": true,
+    "lib": [
+      "dom",
+      "es2015",
+    ],
   },
   "exclude": [
     "tests",
     "dist",
     "node_modules",
-  ]
+  ],
 }
