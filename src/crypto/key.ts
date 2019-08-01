@@ -1,5 +1,5 @@
 import { doubleSha256, InvalidWif, SigPair } from './index';
-import sodium from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers';
 import { Buffer } from 'buffer';
 import bs58 from 'bs58';
 

@@ -1,4 +1,4 @@
-import sodium from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers';
 
 export * from './crypto';
 

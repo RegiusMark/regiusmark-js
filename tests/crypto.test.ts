@@ -1,6 +1,6 @@
 import { init, generateKeyPair, KeyPair, PublicKey, PrivateKey, InvalidWif } from '../src';
 import { PUB_ADDRESS_PREFIX } from '../src/crypto/key';
-import sodium from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers';
 import bs58 from 'bs58';
 
 beforeAll(

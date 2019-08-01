@@ -1,5 +1,6 @@
 import { KeyPair, PrivateKey, PublicKey } from './key';
-import sodium from 'libsodium-wrappers-sumo';
+import sodium from 'libsodium-wrappers';
+import { sha256 as Sha256 } from 'sha.js';
 
 export { KeyPair, PrivateKey, PublicKey };
 
@@ -25,5 +26,11 @@ export function generateKeyPair(): KeyPair {
 }
 
 export function doubleSha256(msg: Uint8Array): Uint8Array {
-  return sodium.crypto_hash_sha256(sodium.crypto_hash_sha256(msg));
+  return hash(hash(msg));
+}
+
+function hash(msg: Uint8Array): Uint8Array {
+  const hasher = new Sha256();
+  hasher.update(msg);
+  return hasher.digest();
 }

@@ -19,12 +19,14 @@
   },
   "dependencies": {
     "bs58": "^4.0.1",
-    "libsodium-wrappers-sumo": "^0.7.5"
+    "libsodium-wrappers": "^0.7.5",
+    "sha.js": "^2.4.11"
   },
   "devDependencies": {
     "@types/bs58": "^4.0.0",
     "@types/jest": "^24.0.16",
-    "@types/libsodium-wrappers-sumo": "^0.7.1",
+    "@types/libsodium-wrappers": "^0.7.5",
+    "@types/sha.js": "^2.4.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "eslint": "^6.1.0",
