@@ -1,13 +1,7 @@
-import { init, generateKeyPair, KeyPair, PublicKey, PrivateKey, InvalidWif } from '../src';
+import { generateKeyPair, KeyPair, PublicKey, PrivateKey, InvalidWif } from '../src';
 import { PUB_ADDRESS_PREFIX } from '../src/crypto/key';
-import sodium from 'libsodium-wrappers';
+import { verify } from 'tweetnacl';
 import bs58 from 'bs58';
-
-beforeAll(
-  async (): Promise<void> => {
-    await init();
-  },
-);
 
 test('create keys', (): void => {
   const keys = generateKeyPair();
@@ -19,8 +13,8 @@ test('create keys', (): void => {
 
   const pub = keys.publicKey.buffer;
   const priv = keys.privateKey.buffer;
-  expect(sodium.memcmp(pub, priv.slice(0, 32))).toBe(false);
-  expect(sodium.memcmp(pub, priv.slice(32, 64))).toBe(true);
+  expect(verify(pub, priv.slice(0, 32))).toBe(false);
+  expect(verify(pub, priv.slice(32, 64))).toBe(true);
 });
 
 test('recreate keys from a WIF', (): void => {
@@ -34,11 +28,11 @@ test('recreate keys from a WIF', (): void => {
   const pubKey = PublicKey.fromWif(publicWif);
   const recKeys = KeyPair.fromWif(privateWif);
 
-  expect(sodium.memcmp(pubKey.buffer, keys.publicKey.buffer)).toBe(true);
+  expect(verify(pubKey.buffer, keys.publicKey.buffer)).toBe(true);
   expect(pubKey.equals(keys.publicKey)).toBe(true);
 
-  expect(sodium.memcmp(recKeys.privateKey.buffer, keys.privateKey.buffer)).toBe(true);
-  expect(sodium.memcmp(recKeys.privateKey.seed, keys.privateKey.seed)).toBe(true);
+  expect(verify(recKeys.privateKey.buffer, keys.privateKey.buffer)).toBe(true);
+  expect(verify(recKeys.privateKey.seed, keys.privateKey.seed)).toBe(true);
   expect(recKeys.privateKey.equals(keys.privateKey)).toBe(true);
 
   expect(pubKey.toWif()).toBe(publicWif);

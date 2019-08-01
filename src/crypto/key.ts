@@ -1,5 +1,5 @@
 import { doubleSha256, InvalidWif, SigPair } from './index';
-import sodium from 'libsodium-wrappers';
+import { sign, verify } from 'tweetnacl';
 import { Buffer } from 'buffer';
 import bs58 from 'bs58';
 
@@ -17,7 +17,7 @@ function wifToArray(wif: string, prefix: number): Uint8Array {
   }
   const checksum = raw.slice(-4);
   const key = raw.slice(0, -4);
-  if (!sodium.memcmp(doubleSha256(key).slice(0, 4), checksum)) {
+  if (!verify(doubleSha256(key).slice(0, 4), checksum)) {
     throw new InvalidWif('invalid checksum');
   }
 
@@ -34,7 +34,7 @@ export abstract class Key {
   abstract toWif(): string;
 
   public equals(other: Key): boolean {
-    return sodium.memcmp(this.buffer, other.buffer);
+    return verify(this.buffer, other.buffer);
   }
 
   public toString(): string {
@@ -47,9 +47,9 @@ export class PrivateKey extends Key {
 
   public constructor(buffer: Uint8Array, seed: Uint8Array) {
     super(buffer);
-    if (buffer.length !== sodium.crypto_sign_SECRETKEYBYTES) {
+    if (buffer.length !== sign.secretKeyLength) {
       throw new InvalidWif(`invalid key length (got ${buffer.length} bytes)`);
-    } else if (seed.length !== sodium.crypto_sign_SEEDBYTES) {
+    } else if (seed.length !== sign.seedLength) {
       throw new InvalidWif(`invalid seed length (got ${seed.length} bytes)`);
     }
     this.seed = seed;
@@ -78,7 +78,7 @@ export class PublicKey extends Key {
 
   public constructor(buffer: Uint8Array) {
     super(buffer);
-    if (buffer.length !== sodium.crypto_sign_PUBLICKEYBYTES) {
+    if (buffer.length !== sign.publicKeyLength) {
       throw new InvalidWif(`invalid key length (got ${buffer.length} bytes)`);
     }
   }
@@ -95,16 +95,16 @@ export class PublicKey extends Key {
   }
 
   public verify(signature: Uint8Array, msg: Uint8Array): boolean {
-    return sodium.crypto_sign_verify_detached(signature, msg, this.buffer) === true;
+    return sign.detached.verify(msg, signature, this.buffer) === true;
   }
 }
 
 export class KeyPair {
   public static fromWif(wif: string): KeyPair {
     const seed = wifToArray(wif, PRIV_BUF_PREFIX);
-    const keys = sodium.crypto_sign_seed_keypair(seed);
+    const keys = sign.keyPair.fromSeed(seed);
 
-    const sk = new PrivateKey(keys.privateKey, seed);
+    const sk = new PrivateKey(keys.secretKey, seed);
     const pk = new PublicKey(keys.publicKey);
     return new KeyPair(sk, pk);
   }
@@ -120,7 +120,7 @@ export class KeyPair {
   public sign(msg: Uint8Array): SigPair {
     return {
       publicKey: this.publicKey,
-      signature: sodium.crypto_sign_detached(msg, this.privateKey.buffer),
+      signature: sign.detached(msg, this.privateKey.buffer),
     };
   }
 }

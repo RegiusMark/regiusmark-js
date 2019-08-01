@@ -1,5 +1,5 @@
 import { KeyPair, PrivateKey, PublicKey } from './key';
-import sodium from 'libsodium-wrappers';
+import { randomBytes, sign } from 'tweetnacl';
 import { sha256 as Sha256 } from 'sha.js';
 
 export { KeyPair, PrivateKey, PublicKey };
@@ -17,19 +17,22 @@ export interface SigPair {
 }
 
 export function generateKeyPair(): KeyPair {
-  const seed = sodium.randombytes_buf(sodium.crypto_sign_SEEDBYTES);
-  const keys = sodium.crypto_sign_seed_keypair(seed);
+  const seed = randomBytes(sign.seedLength);
+  const keys = sign.keyPair.fromSeed(seed);
 
-  const sk = new PrivateKey(keys.privateKey, seed);
+  const sk = new PrivateKey(keys.secretKey, seed);
   const pk = new PublicKey(keys.publicKey);
   return new KeyPair(sk, pk);
 }
 
 export function doubleSha256(msg: Uint8Array): Uint8Array {
-  return hash(hash(msg));
+  // This is a hack to return a true Uint8Array instead of a Buffer
+  const buf = new Uint8Array(32);
+  buf.set(_hash(_hash(msg)));
+  return buf;
 }
 
-function hash(msg: Uint8Array): Uint8Array {
+function _hash(msg: Uint8Array | Buffer): Buffer {
   const hasher = new Sha256();
   hasher.update(msg);
   return hasher.digest();
