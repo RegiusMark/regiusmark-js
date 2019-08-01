@@ -1,6 +1,7 @@
+const merge = require('webpack-merge');
 const path = require('path');
 
-module.exports = {
+const common = {
   entry: './src/index.ts',
   module: {
     rules: [
@@ -16,6 +17,28 @@ module.exports = {
   },
   output: {
     filename: 'index.js',
-    path: path.resolve(__dirname, 'dist')
-  }
+    path: path.resolve(__dirname, 'dist'),
+    library: 'godcoin',
+    libraryTarget: 'umd',
+    globalObject: 'this',
+  },
 };
+
+const node = merge(common, {
+  target: 'node',
+  output: {
+    filename: 'index.js',
+  },
+  externals: {
+    tweetnacl: 'tweetnacl',
+  },
+});
+
+const web = merge(common, {
+  target: 'web',
+  output: {
+    filename: 'index.browser.js',
+  },
+});
+
+module.exports = { node, web };
