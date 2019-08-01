@@ -1,6 +1,6 @@
 import { doubleSha256, InvalidWif, SigPair } from './index';
 import sodium from 'libsodium-wrappers-sumo';
-import { Buffer } from 'safe-buffer';
+import { Buffer } from 'buffer';
 import bs58 from 'bs58';
 
 export const PRIV_BUF_PREFIX = 0x01;
