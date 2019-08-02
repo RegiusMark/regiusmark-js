@@ -30,7 +30,10 @@ const node = merge(common, {
     filename: 'index.js',
   },
   externals: {
+    'big-integer': 'big-integer',
     tweetnacl: 'tweetnacl',
+    'sha.js': 'sha.js',
+    bs58: 'bs58',
   },
 });
 
