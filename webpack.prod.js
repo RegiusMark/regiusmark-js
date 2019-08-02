@@ -9,4 +9,3 @@ const node = merge(common.node, prodCommon);
 const web = merge(common.web, prodCommon);
 
 module.exports = [node, web];
-
