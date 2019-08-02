@@ -1,4 +1,8 @@
-import bigInt, { BigInteger } from 'big-integer';
+import { Big } from 'big.js';
+
+const big = Big();
+big.DP = 0;
+big.RM = 0;
 
 export const ASSET_SYMBOL = 'GRAEL';
 
@@ -20,14 +24,15 @@ export class Asset {
     if (decimals !== Asset.MAX_PRECISION) {
       throw new AssetParseError(`invalid precision`);
     }
-    const num = bigInt(split[0].replace('.', ''));
+    const num = big(split[0].replace('.', ''));
     return new Asset(num);
   }
 
-  public readonly amount: BigInteger;
+  public readonly amount: Big;
 
-  public constructor(amount: BigInteger) {
-    if (!bigInt.isInstance(amount)) throw new TypeError('input must be of type BigInteger');
+  public constructor(amount: Big) {
+    if (!(amount instanceof Big)) throw new TypeError('input must be of type Big');
+    amount.constructor = big;
     this.amount = amount;
   }
 
@@ -36,11 +41,11 @@ export class Asset {
   }
 
   public sub(other: Asset): Asset {
-    return new Asset(this.amount.subtract(other.amount));
+    return new Asset(this.amount.sub(other.amount));
   }
 
   public mul(other: Asset): Asset {
-    const res = this.amount.multiply(other.amount);
+    const res = this.amount.mul(other.amount);
     const mult = setDecimals(res, Asset.MAX_PRECISION * 2, Asset.MAX_PRECISION);
     return new Asset(mult);
   }
@@ -48,7 +53,7 @@ export class Asset {
   public div(other: Asset): Asset {
     if (other.amount.eq(0)) throw new ArithmeticError('divide by zero');
     const t = setDecimals(this.amount, Asset.MAX_PRECISION, Asset.MAX_PRECISION * 2);
-    return new Asset(t.divide(other.amount));
+    return new Asset(t.div(other.amount));
   }
 
   public pow(num: number): Asset {
@@ -62,7 +67,7 @@ export class Asset {
   }
 
   public geq(other: Asset): boolean {
-    return this.amount.geq(other.amount);
+    return this.amount.gte(other.amount);
   }
 
   public gt(other: Asset): boolean {
@@ -74,7 +79,7 @@ export class Asset {
   }
 
   public leq(other: Asset): boolean {
-    return this.amount.leq(other.amount);
+    return this.amount.lte(other.amount);
   }
 
   public eq(other: Asset): boolean {
@@ -94,7 +99,7 @@ export class Asset {
   }
 }
 
-export const EMPTY_GRAEL = new Asset(bigInt(0));
+export const EMPTY_GRAEL = new Asset(big(0));
 
 export class AssetParseError extends Error {
   public constructor(msg: string) {
@@ -108,11 +113,11 @@ export class ArithmeticError extends Error {
   }
 }
 
-function setDecimals(old: BigInteger, oldDecimals: number, newDecimals: number): BigInteger {
+function setDecimals(old: Big, oldDecimals: number, newDecimals: number): Big {
   if (newDecimals > oldDecimals) {
-    return old.multiply(bigInt('1' + '0'.repeat(newDecimals - oldDecimals)));
+    return old.mul(big('1' + '0'.repeat(newDecimals - oldDecimals)));
   } else if (newDecimals < oldDecimals) {
-    return old.divide(bigInt('1' + '0'.repeat(oldDecimals - newDecimals)));
+    return old.div(big('1' + '0'.repeat(oldDecimals - newDecimals)));
   }
   return old;
 }
