@@ -3,10 +3,10 @@ import bigInt, { BigInteger } from 'big-integer';
 export const ASSET_SYMBOL = 'GRAEL';
 
 export class Asset {
-  static readonly MAX_STR_LEN = 26;
-  static readonly MAX_PRECISION = 5;
+  public static readonly MAX_STR_LEN = 26;
+  public static readonly MAX_PRECISION = 5;
 
-  static fromString(str: string): Asset {
+  public static fromString(str: string): Asset {
     if (str.length > Asset.MAX_STR_LEN) throw new AssetParseError('input too large');
     const split = str.split(' ');
     if (split.length !== 2) throw new AssetParseError('invalid format');
@@ -24,31 +24,34 @@ export class Asset {
     return new Asset(num);
   }
 
-  constructor(readonly amount: BigInteger) {
+  public readonly amount: BigInteger;
+
+  public constructor(amount: BigInteger) {
     if (!bigInt.isInstance(amount)) throw new TypeError('input must be of type BigInteger');
+    this.amount = amount;
   }
 
-  add(other: Asset): Asset {
+  public add(other: Asset): Asset {
     return new Asset(this.amount.add(other.amount));
   }
 
-  sub(other: Asset): Asset {
+  public sub(other: Asset): Asset {
     return new Asset(this.amount.subtract(other.amount));
   }
 
-  mul(other: Asset): Asset {
+  public mul(other: Asset): Asset {
     const res = this.amount.multiply(other.amount);
     const mult = setDecimals(res, Asset.MAX_PRECISION * 2, Asset.MAX_PRECISION);
     return new Asset(mult);
   }
 
-  div(other: Asset): Asset {
+  public div(other: Asset): Asset {
     if (other.amount.eq(0)) throw new ArithmeticError('divide by zero');
     const t = setDecimals(this.amount, Asset.MAX_PRECISION, Asset.MAX_PRECISION * 2);
     return new Asset(t.divide(other.amount));
   }
 
-  pow(num: number): Asset {
+  public pow(num: number): Asset {
     if (typeof num !== 'number') throw new TypeError('input must be of type number');
     if (num % 1 !== 0) throw new TypeError('input must be an integer');
 
@@ -58,27 +61,27 @@ export class Asset {
     return new Asset(pow);
   }
 
-  geq(other: Asset): boolean {
+  public geq(other: Asset): boolean {
     return this.amount.geq(other.amount);
   }
 
-  gt(other: Asset): boolean {
+  public gt(other: Asset): boolean {
     return this.amount.gt(other.amount);
   }
 
-  lt(other: Asset): boolean {
+  public lt(other: Asset): boolean {
     return this.amount.lt(other.amount);
   }
 
-  leq(other: Asset): boolean {
+  public leq(other: Asset): boolean {
     return this.amount.leq(other.amount);
   }
 
-  eq(other: Asset) {
+  public eq(other: Asset): boolean {
     return this.amount.eq(other.amount);
   }
 
-  toString(): string {
+  public toString(): string {
     let amount = this.amount.toString();
     const negative = this.amount.lt(0);
     if (negative) amount = amount.substring(1);
@@ -94,13 +97,13 @@ export class Asset {
 export const EMPTY_GRAEL = new Asset(bigInt(0));
 
 export class AssetParseError extends Error {
-  constructor(msg: string) {
+  public constructor(msg: string) {
     super(msg);
   }
 }
 
 export class ArithmeticError extends Error {
-  constructor(msg: string) {
+  public constructor(msg: string) {
     super(msg);
   }
 }

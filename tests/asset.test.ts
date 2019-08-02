@@ -1,8 +1,8 @@
 import { Asset, AssetParseError, ArithmeticError } from '../src';
 import bigInt from 'big-integer';
 
-test('parse valid input', () => {
-  const c = (asset: string, amount: string) => {
+test('parse valid input', (): void => {
+  const c = (asset: string, amount: string): void => {
     expect(Asset.fromString(asset).amount.toString()).toBe(amount);
   };
 
@@ -15,9 +15,9 @@ test('parse valid input', () => {
   c('-0.00000 GRAEL', '0');
 });
 
-test('fail parsing invalid input', () => {
-  const c = (asset: string, err: string) => {
-    expect(() => {
+test('fail parsing invalid input', (): void => {
+  const c = (asset: string, err: string): void => {
+    expect((): void => {
       Asset.fromString(asset);
     }).toThrowError(new AssetParseError(err));
   };
@@ -47,8 +47,8 @@ test('fail parsing invalid input', () => {
   c('1.00000 grael', 'asset type must be GRAEL');
 });
 
-test('asset to string', () => {
-  const c = (asset: string, s: string) => {
+test('asset to string', (): void => {
+  const c = (asset: string, s: string): void => {
     expect(Asset.fromString(asset).toString()).toBe(s);
   };
   c('1.00001 GRAEL', '1.00001 GRAEL');
@@ -60,8 +60,8 @@ test('asset to string', () => {
   c('1.00000 GRAEL', '1.00000 GRAEL');
 });
 
-test('perform arithmetic', () => {
-  const c = (asset: Asset, s: string) => {
+test('perform arithmetic', (): void => {
+  const c = (asset: Asset, s: string): void => {
     expect(asset.toString()).toBe(s);
   };
 
@@ -85,21 +85,22 @@ test('perform arithmetic', () => {
   c(Asset.fromString('5.00000 GRAEL').div(Asset.fromString('10.00000 GRAEL')), '0.50000 GRAEL');
 });
 
-test('fail on invalid arithmetic', () => {
-  expect(() => {
+test('fail on invalid arithmetic', (): void => {
+  expect((): void => {
     new Asset(bigInt(100000)).div(new Asset(bigInt(0)));
   }).toThrow(new ArithmeticError('divide by zero'));
 
-  expect(() => {
+  expect((): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     new Asset(bigInt(100000)).pow('abc' as any);
   }).toThrow(new TypeError('input must be of type number'));
 
-  expect(() => {
+  expect((): void => {
     new Asset(bigInt(100000)).pow(1.75);
   }).toThrow(new TypeError('input must be an integer'));
 });
 
-test('asset comparison', () => {
+test('asset comparison', (): void => {
   expect(Asset.fromString('1.00000 GRAEL').gt(Asset.fromString('0.50000 GRAEL'))).toBe(true);
   expect(Asset.fromString('1.00000 GRAEL').gt(Asset.fromString('0.99000 GRAEL'))).toBe(true);
 
