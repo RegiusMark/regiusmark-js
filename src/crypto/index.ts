@@ -6,6 +6,9 @@ import Sha256 from 'sha.js/sha256';
 
 export { KeyPair, PrivateKey, PublicKey };
 
+export type ScriptHash = Uint8Array;
+export type Script = Uint8Array;
+
 export class InvalidWif extends Error {
   public constructor(msg: string) {
     /* istanbul ignore next */
