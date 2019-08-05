@@ -87,7 +87,7 @@ export class Asset {
   }
 
   public toString(): string {
-    let amount = this.amount.toString();
+    let amount = this.amount.toFixed(0);
     const negative = this.amount.lt(0);
     if (negative) amount = amount.substring(1);
 
