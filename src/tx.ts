@@ -10,9 +10,9 @@ export enum TxType {
 }
 
 export interface TxData {
-  timestamp: Long, // unsigned 64-bit integer, epoch time in ms
-  fee: Asset,
-  signaturePairs: SigPair[],
+  timestamp: Long; // unsigned 64-bit integer, epoch time in ms
+  fee: Asset;
+  signaturePairs: SigPair[];
 }
 
 export class Tx {
@@ -30,7 +30,7 @@ export class Tx {
 }
 
 export interface OwnerTxData {
-  minter: PublicKey;  // Key that signs blocks
+  minter: PublicKey; // Key that signs blocks
   wallet: ScriptHash; // Hot wallet that receives rewards
   script: Script; // Hot wallet previous script
 }
@@ -49,18 +49,18 @@ export class OwnerTx extends Tx implements OwnerTxData {
 }
 
 export interface MintTxData {
-  to: ScriptHash,
-  amount: Asset,
-  attachment: Uint8Array,
-  attachment_name: string,
-  script: Script,
+  to: ScriptHash;
+  amount: Asset;
+  attachment: Uint8Array;
+  attachmentName: string;
+  script: Script;
 }
 
 export class MintTx extends Tx implements MintTxData {
   public to: ScriptHash;
   public amount: Asset;
   public attachment: Uint8Array;
-  public attachment_name: string;
+  public attachmentName: string;
   public script: Script;
 
   public constructor(base: TxData, data: MintTxData) {
@@ -68,14 +68,14 @@ export class MintTx extends Tx implements MintTxData {
     this.to = data.to;
     this.amount = data.amount;
     this.attachment = data.attachment;
-    this.attachment_name = data.attachment_name;
+    this.attachmentName = data.attachmentName;
     this.script = data.script;
   }
 }
 
 export interface RewardTxData {
-  to: ScriptHash,
-  rewards: Asset,
+  to: ScriptHash;
+  rewards: Asset;
 }
 
 export class RewardTx extends Tx implements RewardTxData {
@@ -90,11 +90,11 @@ export class RewardTx extends Tx implements RewardTxData {
 }
 
 export interface TransferTxData {
-  from: ScriptHash,
-  to: ScriptHash,
-  script: Script,
-  amount: Asset,
-  memo: Uint8Array,
+  from: ScriptHash;
+  to: ScriptHash;
+  script: Script;
+  amount: Asset;
+  memo: Uint8Array;
 }
 
 export class TransferTx extends Tx implements TransferTxData {
