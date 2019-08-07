@@ -1,4 +1,5 @@
 import { doubleSha256, InvalidWif, SigPair } from './index';
+import { Script, ScriptBuilder, Operand } from '../script';
 import { sign, verify } from 'tweetnacl';
 import { Buffer } from 'buffer';
 import bs58 from 'bs58';
@@ -92,6 +93,13 @@ export class PublicKey extends Key {
     wifBuf.set(checksum, this.buffer.length + 1);
 
     return PUB_ADDRESS_PREFIX + bs58.encode(Buffer.from(wifBuf.buffer));
+  }
+
+  public toScript(): Script {
+    const builder = new ScriptBuilder();
+    builder.pushPubKey(this);
+    builder.push(Operand.OpCheckSig);
+    return builder.build();
   }
 
   public verify(signature: Uint8Array, msg: Uint8Array): boolean {
