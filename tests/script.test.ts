@@ -1,4 +1,19 @@
-import { Script, ScriptBuilder, Operand, MAX_SCRIPT_BYTE_SIZE, generateKeyPair } from '../src';
+import { Script, ScriptBuilder, Operand, MAX_SCRIPT_BYTE_SIZE, generateKeyPair, doubleSha256 } from '../src';
+
+test('convert public key to default script', (): void => {
+  const key = generateKeyPair().publicKey;
+  const builder = new ScriptBuilder();
+  builder.pushPubKey(key);
+  builder.push(Operand.OpCheckSig);
+
+  expect(key.toScript()).toEqual(builder.build());
+});
+
+test('convert public key to default script hash', (): void => {
+  const key = generateKeyPair().publicKey;
+  const script = key.toScript();
+  expect(script.hash()).toEqual(doubleSha256(script.bytes));
+});
 
 test('build multiple times safely', (): void => {
   const builder = new ScriptBuilder();
