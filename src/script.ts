@@ -1,10 +1,8 @@
+import { PublicKey, ScriptHash, doubleSha256 } from './crypto';
 import { TypeSerializer } from './serializer';
-import { PublicKey } from './crypto';
 import ByteBuffer from 'bytebuffer';
 
 export const MAX_SCRIPT_BYTE_SIZE = 2048;
-
-export type Script = Uint8Array;
 
 export enum Operand {
   // Push value
@@ -28,6 +26,18 @@ export enum Operand {
   OpCheckMultiSigFastFail = 0x33,
 }
 
+export class Script {
+  public readonly bytes: Uint8Array;
+
+  public constructor(bytes: Uint8Array) {
+    this.bytes = bytes;
+  }
+
+  public hash(): ScriptHash {
+    return doubleSha256(this.bytes);
+  }
+}
+
 export class ScriptBuilder {
   private readonly bytes: ByteBuffer;
   private built: boolean;
@@ -43,7 +53,7 @@ export class ScriptBuilder {
     }
     if (!this.built) this.bytes.flip();
     this.built = true;
-    return new Uint8Array(this.bytes.toArrayBuffer());
+    return new Script(new Uint8Array(this.bytes.toArrayBuffer()));
   }
 
   public push(op: Operand): void {
