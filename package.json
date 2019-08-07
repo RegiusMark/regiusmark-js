@@ -29,7 +29,7 @@
     "@types/big.js": "^4.0.5",
     "@types/bs58": "^4.0.0",
     "@types/bytebuffer": "^5.0.40",
-    "@types/jest": "^24.0.16",
+    "@types/jest": "^24.0.17",
     "@types/sha.js": "^2.4.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
@@ -42,7 +42,7 @@
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.38.0",
+    "webpack": "^4.39.1",
     "webpack-cli": "^3.3.6",
     "webpack-merge": "^4.2.1"
   }
