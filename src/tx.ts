@@ -27,13 +27,14 @@ export class TxVariant {
   }
 
   public sign(keyPair: KeyPair, append: boolean = true): SigPair {
-    const buf = this.serialize(undefined, false);
-    buf.flip();
+    const buf = this.serialize(undefined, false).flip();
     const sig = keyPair.sign(new Uint8Array(buf.toArrayBuffer()));
     if (append) {
+      /* istanbul ignore next */
       if (this.tx instanceof TxV0) {
         this.tx.signaturePairs.push(sig);
       } else {
+        /* istanbul ignore next */
         throw new Error('unknown tx version');
       }
     }
@@ -43,9 +44,11 @@ export class TxVariant {
   public serialize(buf?: ByteBuffer, includeSigs?: boolean): ByteBuffer {
     if (!buf) buf = new ByteBuffer(8192, false);
 
+    /* istanbul ignore next */
     if (this.tx instanceof TxV0) {
       buf.writeUint16(0);
     } else {
+      /* istanbul ignore next */
       throw new Error('unknown tx version');
     }
 
@@ -53,13 +56,13 @@ export class TxVariant {
     return buf;
   }
 
-  public static deserialize(buf: ByteBuffer): TxVariantVer {
+  public static deserialize(buf: ByteBuffer): TxVariant {
     const ver = buf.readUint16();
     switch (ver) {
       case 0:
-        return TxV0.deserialize(buf);
+        return new TxVariant(TxV0.deserialize(buf));
       default:
-        throw new Error('unexpected tx version: ' + ver);
+        throw new Error('unknown tx version: ' + ver);
     }
   }
 }
@@ -78,7 +81,7 @@ export abstract class TxV0 {
 
   public constructor(type: TxType, data: TxData) {
     if (!data.timestamp.unsigned) {
-      throw new Error('timestamp must be unsigned long');
+      throw new Error('timestamp must be an unsigned long');
     }
     this.type = type;
     this.timestamp = data.timestamp;
@@ -109,6 +112,7 @@ export abstract class TxV0 {
   public static deserialize(buf: ByteBuffer): TxVariantV0 {
     const header = TxV0.deserializeHeader(buf);
 
+    /* istanbul ignore next */
     switch (header[0]) {
       case TxType.OWNER: {
         const data = OwnerTxV0.deserializeData(buf);
@@ -131,6 +135,7 @@ export abstract class TxV0 {
         return new TransferTxV0(header[1], data);
       }
       default:
+        /* istanbul ignore next */
         throw new Error('unknown tx type deserializing tx: ' + header[0]);
     }
   }
