@@ -1,6 +1,7 @@
-import { PublicKey, SigPair, ScriptHash, Script } from './crypto';
 import { TypeSerializer, TypeDeserializer } from './serializer';
+import { PublicKey, SigPair, ScriptHash } from './crypto';
 import ByteBuffer from 'bytebuffer';
+import { Script } from './script';
 import { Asset } from './asset';
 import Long from 'long';
 

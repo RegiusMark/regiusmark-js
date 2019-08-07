@@ -4,6 +4,8 @@ import ByteBuffer from 'bytebuffer';
 
 export const MAX_SCRIPT_BYTE_SIZE = 2048;
 
+export type Script = Uint8Array;
+
 export enum Operand {
   // Push value
   PushFalse = 0x00,
