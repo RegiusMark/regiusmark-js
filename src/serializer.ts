@@ -3,6 +3,7 @@ import ByteBuffer from 'bytebuffer';
 import { Script } from './script';
 import { sign } from 'tweetnacl';
 import { Asset } from './asset';
+import { Big } from 'big.js';
 import Long from 'long';
 
 export class TypeSerializer {
@@ -17,6 +18,7 @@ export class TypeSerializer {
   }
 
   public static string(buf: ByteBuffer, value: string): void {
+    buf.writeUint32(value.length);
     buf.writeUTF8String(value);
   }
 
