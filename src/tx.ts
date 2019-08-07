@@ -1,5 +1,5 @@
+import { KeyPair, PublicKey, SigPair, ScriptHash } from './crypto';
 import { TypeSerializer, TypeDeserializer } from './serializer';
-import { PublicKey, SigPair, ScriptHash } from './crypto';
 import ByteBuffer from 'bytebuffer';
 import { Script } from './script';
 import { Asset } from './asset';
@@ -26,7 +26,21 @@ export class TxVariant {
     this.tx = tx;
   }
 
-  public serialize(buf?: ByteBuffer): ByteBuffer {
+  public sign(keyPair: KeyPair, append: boolean = true): SigPair {
+    const buf = this.serialize(undefined, false);
+    buf.flip();
+    const sig = keyPair.sign(new Uint8Array(buf.toArrayBuffer()));
+    if (append) {
+      if (this.tx instanceof TxV0) {
+        this.tx.signaturePairs.push(sig);
+      } else {
+        throw new Error('unknown tx version');
+      }
+    }
+    return sig;
+  }
+
+  public serialize(buf?: ByteBuffer, includeSigs?: boolean): ByteBuffer {
     if (!buf) buf = new ByteBuffer(8192, false);
 
     if (this.tx instanceof TxV0) {
@@ -35,7 +49,7 @@ export class TxVariant {
       throw new Error('unknown tx version');
     }
 
-    this.tx.serialize(buf);
+    this.tx.serialize(buf, includeSigs);
     return buf;
   }
 
