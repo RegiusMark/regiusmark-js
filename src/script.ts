@@ -37,7 +37,7 @@ export class ScriptBuilder {
     this.built = false;
   }
 
-  public build(): Uint8Array {
+  public build(): Script {
     if (this.bytes.offset > MAX_SCRIPT_BYTE_SIZE) {
       throw new Error('maximum script size exceeded');
     }
