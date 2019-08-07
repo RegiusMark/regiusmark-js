@@ -30,10 +30,12 @@ const node = merge(common, {
     filename: 'index.js',
   },
   externals: {
-    'big-integer': 'big-integer',
-    tweetnacl: 'tweetnacl',
+    'big.js': 'big.js',
+    'bs58': 'bs58',
+    'bytebuffer': 'bytebuffer',
+    'long': 'long',
     'sha.js': 'sha.js',
-    bs58: 'bs58',
+    'tweetnacl': 'tweetnacl'
   },
 });
 
