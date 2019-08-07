@@ -1,5 +1,6 @@
 import { PublicKey, SigPair, ScriptHash, Script } from './crypto';
 import { TypeSerializer, TypeDeserializer } from './serializer';
+import ByteBuffer from 'bytebuffer';
 import { Asset } from './asset';
 import Long from 'long';
 
@@ -10,7 +11,41 @@ export enum TxType {
   TRANSFER = 3,
 }
 
-export type TxVariant = OwnerTx | MintTx | RewardTx | TransferTx;
+export type TxVariantV0 = OwnerTxV0 | MintTxV0 | RewardTxV0 | TransferTxV0;
+
+/// This type can expose multiple versions of the transaction API
+export type TxVariantVer = TxVariantV0;
+
+export class TxVariant {
+  public readonly tx: TxVariantVer;
+
+  public constructor(tx: TxVariantVer) {
+    this.tx = tx;
+  }
+
+  public serialize(buf?: ByteBuffer): ByteBuffer {
+    if (!buf) buf = new ByteBuffer(8192, false);
+
+    if (this.tx instanceof TxV0) {
+      buf.writeUint16(0);
+    } else {
+      throw new Error('unknown tx version');
+    }
+
+    this.tx.serialize(buf);
+    return buf;
+  }
+
+  public static deserialize(buf: ByteBuffer): TxVariantVer {
+    const ver = buf.readUint16();
+    switch (ver) {
+      case 0:
+        return TxV0.deserialize(buf);
+      default:
+        throw new Error('unexpected tx version: ' + ver);
+    }
+  }
+}
 
 export interface TxData {
   timestamp: Long; // unsigned 64-bit integer, epoch time in ms
@@ -18,7 +53,7 @@ export interface TxData {
   signaturePairs: SigPair[];
 }
 
-export abstract class Tx {
+export abstract class TxV0 {
   public readonly type: TxType;
   public timestamp: Long;
   public fee: Asset;
@@ -54,29 +89,29 @@ export abstract class Tx {
     TypeSerializer.asset(buf, this.fee);
   }
 
-  public static deserialize(buf: ByteBuffer): TxVariant {
-    const header = Tx.deserializeHeader(buf);
+  public static deserialize(buf: ByteBuffer): TxVariantV0 {
+    const header = TxV0.deserializeHeader(buf);
 
     switch (header[0]) {
       case TxType.OWNER: {
-        const data = OwnerTx.deserializeData(buf);
-        header[1].signaturePairs = Tx.deserializeSigs(buf);
-        return new OwnerTx(header[1], data);
+        const data = OwnerTxV0.deserializeData(buf);
+        header[1].signaturePairs = TxV0.deserializeSigs(buf);
+        return new OwnerTxV0(header[1], data);
       }
       case TxType.MINT: {
-        const data = MintTx.deserializeData(buf);
-        header[1].signaturePairs = Tx.deserializeSigs(buf);
-        return new MintTx(header[1], data);
+        const data = MintTxV0.deserializeData(buf);
+        header[1].signaturePairs = TxV0.deserializeSigs(buf);
+        return new MintTxV0(header[1], data);
       }
       case TxType.REWARD: {
-        const data = RewardTx.deserializeData(buf);
-        header[1].signaturePairs = Tx.deserializeSigs(buf);
-        return new RewardTx(header[1], data);
+        const data = RewardTxV0.deserializeData(buf);
+        header[1].signaturePairs = TxV0.deserializeSigs(buf);
+        return new RewardTxV0(header[1], data);
       }
       case TxType.TRANSFER: {
-        const data = TransferTx.deserializeData(buf);
-        header[1].signaturePairs = Tx.deserializeSigs(buf);
-        return new TransferTx(header[1], data);
+        const data = TransferTxV0.deserializeData(buf);
+        header[1].signaturePairs = TxV0.deserializeSigs(buf);
+        return new TransferTxV0(header[1], data);
       }
       default:
         throw new Error('unknown tx type deserializing tx: ' + header[0]);
@@ -121,7 +156,7 @@ export interface OwnerTxData {
   script: Script; // Hot wallet previous script
 }
 
-export class OwnerTx extends Tx implements OwnerTxData {
+export class OwnerTxV0 extends TxV0 implements OwnerTxData {
   public minter: PublicKey;
   public wallet: ScriptHash;
   public script: Script;
@@ -160,7 +195,7 @@ export interface MintTxData {
   script: Script;
 }
 
-export class MintTx extends Tx implements MintTxData {
+export class MintTxV0 extends TxV0 implements MintTxData {
   public to: ScriptHash;
   public amount: Asset;
   public attachment: Uint8Array;
@@ -206,7 +241,7 @@ export interface RewardTxData {
   rewards: Asset;
 }
 
-export class RewardTx extends Tx implements RewardTxData {
+export class RewardTxV0 extends TxV0 implements RewardTxData {
   public to: ScriptHash;
   public rewards: Asset;
 
@@ -240,7 +275,7 @@ export interface TransferTxData {
   memo: Uint8Array;
 }
 
-export class TransferTx extends Tx implements TransferTxData {
+export class TransferTxV0 extends TxV0 implements TransferTxData {
   public from: ScriptHash;
   public to: ScriptHash;
   public script: Script;
