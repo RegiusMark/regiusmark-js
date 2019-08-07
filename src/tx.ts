@@ -174,13 +174,13 @@ export class OwnerTxV0 extends TxV0 implements OwnerTxData {
   public serializeData(buf: ByteBuffer): void {
     TypeSerializer.publicKey(buf, this.minter);
     TypeSerializer.scriptHash(buf, this.wallet);
-    TypeSerializer.buffer(buf, this.script);
+    TypeSerializer.script(buf, this.script);
   }
 
   public static deserializeData(buf: ByteBuffer): OwnerTxData {
     const minter = TypeDeserializer.publicKey(buf);
     const wallet = TypeDeserializer.scriptHash(buf);
-    const script = TypeDeserializer.buffer(buf);
+    const script = TypeDeserializer.script(buf);
 
     return {
       minter,
@@ -219,7 +219,7 @@ export class MintTxV0 extends TxV0 implements MintTxData {
     TypeSerializer.asset(buf, this.amount);
     TypeSerializer.buffer(buf, this.attachment);
     TypeSerializer.string(buf, this.attachmentName);
-    TypeSerializer.buffer(buf, this.script);
+    TypeSerializer.script(buf, this.script);
   }
 
   public static deserializeData(buf: ByteBuffer): MintTxData {
@@ -227,7 +227,7 @@ export class MintTxV0 extends TxV0 implements MintTxData {
     const amount = TypeDeserializer.asset(buf);
     const attachment = TypeDeserializer.buffer(buf);
     const attachmentName = TypeDeserializer.string(buf);
-    const script = TypeDeserializer.buffer(buf);
+    const script = TypeDeserializer.script(buf);
 
     return {
       to,
@@ -297,7 +297,7 @@ export class TransferTxV0 extends TxV0 implements TransferTxData {
   public serializeData(buf: ByteBuffer): void {
     TypeSerializer.scriptHash(buf, this.from);
     TypeSerializer.scriptHash(buf, this.to);
-    TypeSerializer.buffer(buf, this.script);
+    TypeSerializer.script(buf, this.script);
     TypeSerializer.asset(buf, this.amount);
     TypeSerializer.buffer(buf, this.memo);
   }
@@ -305,7 +305,7 @@ export class TransferTxV0 extends TxV0 implements TransferTxData {
   public static deserializeData(buf: ByteBuffer): TransferTxData {
     const from = TypeDeserializer.scriptHash(buf);
     const to = TypeDeserializer.scriptHash(buf);
-    const script = TypeDeserializer.buffer(buf);
+    const script = TypeDeserializer.script(buf);
     const amount = TypeDeserializer.asset(buf);
     const memo = TypeDeserializer.buffer(buf);
 

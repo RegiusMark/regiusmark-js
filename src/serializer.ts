@@ -1,5 +1,6 @@
 import { PublicKey, SigPair, ScriptHash } from './crypto';
 import ByteBuffer from 'bytebuffer';
+import { Script } from './script';
 import { sign } from 'tweetnacl';
 import { Asset } from './asset';
 import Long from 'long';
@@ -21,6 +22,10 @@ export class TypeSerializer {
 
   public static publicKey(buf: ByteBuffer, value: PublicKey): void {
     TypeSerializer.sizedBuffer(buf, value.buffer);
+  }
+
+  public static script(buf: ByteBuffer, value: Script): void {
+    TypeSerializer.buffer(buf, value.bytes);
   }
 
   public static scriptHash(buf: ByteBuffer, value: ScriptHash): void {
@@ -63,6 +68,11 @@ export class TypeDeserializer {
   public static publicKey(buf: ByteBuffer): PublicKey {
     const wif = TypeDeserializer.sizedBuffer(buf, sign.publicKeyLength);
     return new PublicKey(wif);
+  }
+
+  public static script(buf: ByteBuffer): Script {
+    const bytes = TypeDeserializer.buffer(buf);
+    return new Script(bytes);
   }
 
   public static scriptHash(buf: ByteBuffer): ScriptHash {
