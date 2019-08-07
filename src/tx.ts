@@ -13,7 +13,9 @@ export enum TxType {
 
 export type TxVariantV0 = OwnerTxV0 | MintTxV0 | RewardTxV0 | TransferTxV0;
 
-/// This type can expose multiple versions of the transaction API
+/**
+ * This type can expose multiple versions of the transaction API.
+ */
 export type TxVariantVer = TxVariantV0;
 
 export class TxVariant {
