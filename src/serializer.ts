@@ -12,7 +12,7 @@ export class TypeSerializer {
   }
 
   public static sizedBuffer(buf: ByteBuffer, value: Uint8Array): void {
-    buf.writeBytes(value);
+    buf.append(value);
   }
 
   public static string(buf: ByteBuffer, value: string): void {
