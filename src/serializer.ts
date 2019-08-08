@@ -1,5 +1,5 @@
 import { PublicKey, SigPair, ScriptHash } from './crypto';
-import ByteBuffer from 'bytebuffer';
+import { ByteBuffer } from './bytebuffer';
 import { Script } from './script';
 import { sign } from 'tweetnacl';
 import { Asset } from './asset';
@@ -8,13 +8,13 @@ import Long from 'long';
 
 export class TypeSerializer {
   public static buffer(buf: ByteBuffer, value: Uint8Array): void {
-    let len = value.length;
+    let len = value.byteLength;
     buf.writeUint32(len);
-    buf.append(value);
+    buf.writeBytes(value);
   }
 
   public static sizedBuffer(buf: ByteBuffer, value: Uint8Array): void {
-    buf.append(value);
+    buf.writeBytes(value);
   }
 
   public static string(buf: ByteBuffer, value: string): void {
@@ -41,7 +41,7 @@ export class TypeSerializer {
 
   public static asset(buf: ByteBuffer, value: Asset): void {
     let num = Long.fromString(value.amount.toFixed(0), false);
-    buf.writeVarint64ZigZag(num);
+    buf.writeVarI64ZigZag(num);
   }
 }
 
@@ -53,18 +53,13 @@ export class TypeDeserializer {
   }
 
   public static sizedBuffer(buf: ByteBuffer, len: number): Uint8Array {
-    return new Uint8Array(buf.readBytes(len).toArrayBuffer());
+    return buf.readBytes(len);
   }
 
   public static string(buf: ByteBuffer): string {
     const len = buf.readUint32();
     if (len === 0) return '';
-    let res = buf.readUTF8String(len);
-    if (typeof res === 'string') {
-      return res;
-    } else {
-      return res.string;
-    }
+    return buf.readUTF8String(len);
   }
 
   public static publicKey(buf: ByteBuffer): PublicKey {
@@ -92,7 +87,7 @@ export class TypeDeserializer {
   }
 
   public static asset(buf: ByteBuffer): Asset {
-    const amt = Big(buf.readVarint64ZigZag().toString());
+    const amt = Big(buf.readVarI64ZigZag().toString());
     return new Asset(amt);
   }
 }

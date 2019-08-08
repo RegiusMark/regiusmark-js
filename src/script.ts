@@ -1,6 +1,6 @@
 import { PublicKey, ScriptHash, doubleSha256 } from './crypto';
 import { TypeSerializer } from './serializer';
-import ByteBuffer from 'bytebuffer';
+import { ByteBuffer } from './bytebuffer';
 
 export const MAX_SCRIPT_BYTE_SIZE = 2048;
 
@@ -43,7 +43,7 @@ export class ScriptBuilder {
   private built: boolean;
 
   public constructor() {
-    this.bytes = new ByteBuffer(MAX_SCRIPT_BYTE_SIZE, false);
+    this.bytes = ByteBuffer.alloc(MAX_SCRIPT_BYTE_SIZE);
     this.built = false;
   }
 
@@ -51,9 +51,8 @@ export class ScriptBuilder {
     if (this.bytes.offset > MAX_SCRIPT_BYTE_SIZE) {
       throw new Error('maximum script size exceeded');
     }
-    if (!this.built) this.bytes.flip();
     this.built = true;
-    return new Script(new Uint8Array(this.bytes.toArrayBuffer()));
+    return new Script(this.bytes.sharedView());
   }
 
   public push(op: Operand): void {

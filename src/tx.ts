@@ -1,6 +1,6 @@
 import { KeyPair, PublicKey, SigPair, ScriptHash } from './crypto';
 import { TypeSerializer, TypeDeserializer } from './serializer';
-import ByteBuffer from 'bytebuffer';
+import { ByteBuffer } from './bytebuffer';
 import { Script } from './script';
 import { Asset } from './asset';
 import Long from 'long';
@@ -27,8 +27,8 @@ export class TxVariant {
   }
 
   public sign(keyPair: KeyPair, append: boolean = true): SigPair {
-    const buf = this.serialize(undefined, false).flip();
-    const sig = keyPair.sign(new Uint8Array(buf.toArrayBuffer()));
+    const buf = this.serialize(undefined, false);
+    const sig = keyPair.sign(buf.sharedView());
     if (append) {
       /* istanbul ignore next */
       if (this.tx instanceof TxV0) {
@@ -42,7 +42,7 @@ export class TxVariant {
   }
 
   public serialize(buf?: ByteBuffer, includeSigs?: boolean): ByteBuffer {
-    if (!buf) buf = new ByteBuffer(8192, false);
+    if (!buf) buf = ByteBuffer.alloc(8192);
 
     /* istanbul ignore next */
     if (this.tx instanceof TxV0) {
