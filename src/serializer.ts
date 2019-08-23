@@ -1,4 +1,4 @@
-import { PublicKey, SigPair, ScriptHash } from './crypto';
+import { PublicKey, SigPair } from './crypto';
 import { ByteBuffer } from './bytebuffer';
 import { Script } from './script';
 import { sign } from 'tweetnacl';
@@ -17,6 +17,11 @@ export class TypeSerializer {
     buf.writeBytes(value);
   }
 
+  public static digest(buf: ByteBuffer, value: Uint8Array): void {
+    if (value.byteLength !== 32) throw new Error('expected sha256 digest length');
+    TypeSerializer.sizedBuffer(buf, value);
+  }
+
   public static string(buf: ByteBuffer, value: string): void {
     buf.writeUint32(value.length);
     buf.writeUTF8String(value);
@@ -28,10 +33,6 @@ export class TypeSerializer {
 
   public static script(buf: ByteBuffer, value: Script): void {
     TypeSerializer.buffer(buf, value.bytes);
-  }
-
-  public static scriptHash(buf: ByteBuffer, value: ScriptHash): void {
-    TypeSerializer.sizedBuffer(buf, value);
   }
 
   public static sigPair(buf: ByteBuffer, value: SigPair): void {
@@ -56,6 +57,11 @@ export class TypeDeserializer {
     return buf.readBytes(len);
   }
 
+  public static digest(buf: ByteBuffer): Uint8Array {
+    // Sha256 Hash is 32-bytes
+    return TypeDeserializer.sizedBuffer(buf, 32);
+  }
+
   public static string(buf: ByteBuffer): string {
     const len = buf.readUint32();
     if (len === 0) return '';
@@ -70,11 +76,6 @@ export class TypeDeserializer {
   public static script(buf: ByteBuffer): Script {
     const bytes = TypeDeserializer.buffer(buf);
     return new Script(bytes);
-  }
-
-  public static scriptHash(buf: ByteBuffer): ScriptHash {
-    // Sha256 Hash is 32-bytes
-    return TypeDeserializer.sizedBuffer(buf, 32);
   }
 
   public static sigPair(buf: ByteBuffer): SigPair {

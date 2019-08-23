@@ -1,5 +1,4 @@
-import { OwnerTxV0, MintTxV0, RewardTxV0, TransferTxV0, Asset, generateKeyPair, TxVariant } from '../src';
-import { ByteBuffer } from '../src/bytebuffer';
+import { OwnerTxV0, ByteBuffer, MintTxV0, RewardTxV0, TransferTxV0, Asset, generateKeyPair, TxVariant } from '../src';
 import { sign } from 'tweetnacl';
 import Long from 'long';
 

@@ -192,13 +192,13 @@ export class OwnerTxV0 extends TxV0 implements OwnerTxData {
 
   public serializeData(buf: ByteBuffer): void {
     TypeSerializer.publicKey(buf, this.minter);
-    TypeSerializer.scriptHash(buf, this.wallet);
+    TypeSerializer.digest(buf, this.wallet);
     TypeSerializer.script(buf, this.script);
   }
 
   public static deserializeData(buf: ByteBuffer): OwnerTxData {
     const minter = TypeDeserializer.publicKey(buf);
-    const wallet = TypeDeserializer.scriptHash(buf);
+    const wallet = TypeDeserializer.digest(buf);
     const script = TypeDeserializer.script(buf);
 
     return {
@@ -234,7 +234,7 @@ export class MintTxV0 extends TxV0 implements MintTxData {
   }
 
   public serializeData(buf: ByteBuffer): void {
-    TypeSerializer.scriptHash(buf, this.to);
+    TypeSerializer.digest(buf, this.to);
     TypeSerializer.asset(buf, this.amount);
     TypeSerializer.buffer(buf, this.attachment);
     TypeSerializer.string(buf, this.attachmentName);
@@ -242,7 +242,7 @@ export class MintTxV0 extends TxV0 implements MintTxData {
   }
 
   public static deserializeData(buf: ByteBuffer): MintTxData {
-    const to = TypeDeserializer.scriptHash(buf);
+    const to = TypeDeserializer.digest(buf);
     const amount = TypeDeserializer.asset(buf);
     const attachment = TypeDeserializer.buffer(buf);
     const attachmentName = TypeDeserializer.string(buf);
@@ -274,12 +274,12 @@ export class RewardTxV0 extends TxV0 implements RewardTxData {
   }
 
   public serializeData(buf: ByteBuffer): void {
-    TypeSerializer.scriptHash(buf, this.to);
+    TypeSerializer.digest(buf, this.to);
     TypeSerializer.asset(buf, this.rewards);
   }
 
   public static deserializeData(buf: ByteBuffer): RewardTxData {
-    const to = TypeDeserializer.scriptHash(buf);
+    const to = TypeDeserializer.digest(buf);
     const rewards = TypeDeserializer.asset(buf);
 
     return {
@@ -314,16 +314,16 @@ export class TransferTxV0 extends TxV0 implements TransferTxData {
   }
 
   public serializeData(buf: ByteBuffer): void {
-    TypeSerializer.scriptHash(buf, this.from);
-    TypeSerializer.scriptHash(buf, this.to);
+    TypeSerializer.digest(buf, this.from);
+    TypeSerializer.digest(buf, this.to);
     TypeSerializer.script(buf, this.script);
     TypeSerializer.asset(buf, this.amount);
     TypeSerializer.buffer(buf, this.memo);
   }
 
   public static deserializeData(buf: ByteBuffer): TransferTxData {
-    const from = TypeDeserializer.scriptHash(buf);
-    const to = TypeDeserializer.scriptHash(buf);
+    const from = TypeDeserializer.digest(buf);
+    const to = TypeDeserializer.digest(buf);
     const script = TypeDeserializer.script(buf);
     const amount = TypeDeserializer.asset(buf);
     const memo = TypeDeserializer.buffer(buf);
