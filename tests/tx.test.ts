@@ -1,4 +1,17 @@
-import { OwnerTxV0, ByteBuffer, MintTxV0, RewardTxV0, TransferTxV0, Asset, generateKeyPair, TxVariant } from '../src';
+import {
+  OwnerTxV0,
+  ByteBuffer,
+  MintTxV0,
+  RewardTxV0,
+  TransferTxV0,
+  Asset,
+  generateKeyPair,
+  TxVariant,
+  TxVerifyError,
+  TxVerifyErrorKind,
+  ScriptEvalError,
+  ScriptEvalErrorKind,
+} from '../src';
 import { sign } from 'tweetnacl';
 import Long from 'long';
 
@@ -251,4 +264,18 @@ test('fail to deserialize unknown tx type', (): void => {
   expect((): void => {
     TxVariant.deserialize(ByteBuffer.from(new Uint8Array([0x00, 0x00, 0xff])));
   }).toThrowError('unknown tx type deserializing header: ' + 0xff);
+});
+
+test('tx script eval err message', (): void => {
+  const err = new TxVerifyError(
+    TxVerifyErrorKind.ScriptEval,
+    new ScriptEvalError(ScriptEvalErrorKind.StackUnderflow, 10),
+  );
+  expect(err.message).toBe('script eval: stack underflow (pos: 10)');
+});
+
+test('tx script eval err requires meta', (): void => {
+  expect((): void => {
+    new TxVerifyError(TxVerifyErrorKind.ScriptEval);
+  }).toThrowError('meta required for script evaluation error');
 });

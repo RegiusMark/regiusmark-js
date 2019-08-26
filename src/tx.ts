@@ -337,3 +337,67 @@ export class TransferTxV0 extends TxV0 implements TransferTxData {
     };
   }
 }
+
+export enum TxVerifyErrorKind {
+  ScriptEval = 0x00,
+  ScriptHashMismatch = 0x01,
+  ScriptRetFalse = 0x02,
+  Arithmetic = 0x03,
+  InsufficientBalance = 0x04,
+  InvalidFeeAmount = 0x05,
+  TooManySignatures = 0x06,
+  TxTooLarge = 0x07,
+  TxProhibited = 0x08,
+  TxExpired = 0x09,
+  TxDupe = 0x0a,
+}
+
+export class TxVerifyError extends Error {
+  public kind: TxVerifyErrorKind;
+  public meta?: Error;
+
+  public constructor(kind: TxVerifyErrorKind, meta?: Error) {
+    super();
+    this.kind = kind;
+    this.meta = meta;
+    switch (this.kind) {
+      case TxVerifyErrorKind.ScriptEval:
+        if (!this.meta) throw new Error('meta required for script evaluation error');
+        this.message = 'script eval: ' + this.meta.message;
+        break;
+      case TxVerifyErrorKind.ScriptHashMismatch:
+        this.message = 'script hash mismatch';
+        break;
+      case TxVerifyErrorKind.ScriptRetFalse:
+        this.message = 'script returned false';
+        break;
+      case TxVerifyErrorKind.Arithmetic:
+        this.message = 'arithmetic error';
+        break;
+      case TxVerifyErrorKind.InsufficientBalance:
+        this.message = 'insufficient balance';
+        break;
+      case TxVerifyErrorKind.InvalidFeeAmount:
+        this.message = 'invalid fee amount';
+        break;
+      case TxVerifyErrorKind.TooManySignatures:
+        this.message = 'too many signatures';
+        break;
+      case TxVerifyErrorKind.TxTooLarge:
+        this.message = 'tx too large';
+        break;
+      case TxVerifyErrorKind.TxProhibited:
+        this.message = 'tx prohibited';
+        break;
+      case TxVerifyErrorKind.TxExpired:
+        this.message = 'tx expired';
+        break;
+      case TxVerifyErrorKind.TxDupe:
+        this.message = 'tx dupe';
+        break;
+      default:
+        const _exhaustiveCheck: never = this.kind;
+        throw new Error(_exhaustiveCheck);
+    }
+  }
+}

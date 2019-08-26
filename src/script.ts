@@ -80,3 +80,43 @@ export class ScriptBuilder {
     }
   }
 }
+
+export enum ScriptEvalErrorKind {
+  UnexpectedEOF = 0x00,
+  UnknownOp = 0x01,
+  InvalidItemOnStack = 0x02,
+  StackOverflow = 0x03,
+  StackUnderflow = 0x04,
+}
+
+export class ScriptEvalError extends Error {
+  public position: number;
+  public kind: ScriptEvalErrorKind;
+
+  public constructor(kind: ScriptEvalErrorKind, position: number) {
+    super();
+    this.position = position;
+    this.kind = kind;
+    switch (this.kind) {
+      case ScriptEvalErrorKind.UnexpectedEOF:
+        this.message = 'unexpected eof';
+        break;
+      case ScriptEvalErrorKind.UnknownOp:
+        this.message = 'unknown op';
+        break;
+      case ScriptEvalErrorKind.InvalidItemOnStack:
+        this.message = 'invalid item on stack';
+        break;
+      case ScriptEvalErrorKind.StackOverflow:
+        this.message = 'stack overflow';
+        break;
+      case ScriptEvalErrorKind.StackUnderflow:
+        this.message = 'stack underflow';
+        break;
+      default:
+        const _exhaustiveCHeck: never = this.kind;
+        throw new Error(_exhaustiveCHeck);
+    }
+    this.message += ' (pos: ' + this.position + ')';
+  }
+}
