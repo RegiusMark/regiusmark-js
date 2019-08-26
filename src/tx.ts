@@ -6,10 +6,10 @@ import { Asset } from './asset';
 import Long from 'long';
 
 export enum TxType {
-  OWNER = 0,
-  MINT = 1,
-  REWARD = 2,
-  TRANSFER = 3,
+  OWNER = 0x00,
+  MINT = 0x01,
+  REWARD = 0x02,
+  TRANSFER = 0x03,
 }
 
 export type TxVariantV0 = OwnerTxV0 | MintTxV0 | RewardTxV0 | TransferTxV0;
@@ -46,7 +46,7 @@ export class TxVariant {
 
     /* istanbul ignore next */
     if (this.tx instanceof TxV0) {
-      buf.writeUint16(0);
+      buf.writeUint16(0x00);
     } else {
       /* istanbul ignore next */
       throw new Error('unknown tx version');
@@ -59,7 +59,7 @@ export class TxVariant {
   public static deserialize(buf: ByteBuffer): TxVariant {
     const ver = buf.readUint16();
     switch (ver) {
-      case 0:
+      case 0x00:
         return new TxVariant(TxV0.deserialize(buf));
       default:
         throw new Error('unknown tx version: ' + ver);

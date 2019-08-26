@@ -99,7 +99,7 @@ export class BlockHeader {
   public static deserialize(buf: ByteBuffer): BlockHeader {
     const ver = buf.readUint16();
     switch (ver) {
-      case 0:
+      case 0x00:
         return new BlockHeader(BlockHeaderV0.deserialize(buf));
       default:
         throw new Error('unknown block version: ' + ver);
@@ -129,7 +129,7 @@ export class BlockHeaderV0 implements BlockHeaderDataV0 {
 
   public serialize(buf: ByteBuffer): void {
     // Version (2 bytes)
-    buf.writeUint16(0);
+    buf.writeUint16(0x00);
 
     TypeSerializer.digest(buf, this.previousHash);
     buf.writeUint64(this.height);
