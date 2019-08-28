@@ -104,12 +104,14 @@ export const EMPTY_GRAEL = new Asset(big(0));
 export class AssetParseError extends Error {
   public constructor(msg: string) {
     super(msg);
+    Object.setPrototypeOf(this, AssetParseError.prototype);
   }
 }
 
 export class ArithmeticError extends Error {
   public constructor(msg: string) {
     super(msg);
+    Object.setPrototypeOf(this, ArithmeticError.prototype);
   }
 }
 

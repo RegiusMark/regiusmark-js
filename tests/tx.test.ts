@@ -266,7 +266,7 @@ test('fail to deserialize unknown tx type', (): void => {
   }).toThrowError('unknown tx type deserializing header: ' + 0xff);
 });
 
-test('tx script eval err message', (): void => {
+test('tx script eval error message', (): void => {
   const err = new TxVerifyError(
     TxVerifyErrorKind.ScriptEval,
     new ScriptEvalError(ScriptEvalErrorKind.StackUnderflow, 10),
@@ -274,8 +274,8 @@ test('tx script eval err message', (): void => {
   expect(err.message).toBe('script eval: stack underflow (pos: 10)');
 });
 
-test('tx script eval err requires meta', (): void => {
+test('tx script eval error requires meta', (): void => {
   expect((): void => {
     new TxVerifyError(TxVerifyErrorKind.ScriptEval);
-  }).toThrowError('meta required for script evaluation error');
+  }).toThrowError('invalid error type for ScriptEvalError');
 });

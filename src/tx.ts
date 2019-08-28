@@ -1,7 +1,7 @@
+import { Script, ScriptEvalError, ScriptEvalErrorKind } from './script';
 import { KeyPair, PublicKey, SigPair, ScriptHash } from './crypto';
 import { TypeSerializer, TypeDeserializer } from './serializer';
 import { ByteBuffer } from './bytebuffer';
-import { Script } from './script';
 import { Asset } from './asset';
 import Long from 'long';
 
@@ -358,11 +358,13 @@ export class TxVerifyError extends Error {
 
   public constructor(kind: TxVerifyErrorKind, meta?: Error) {
     super();
+    Object.setPrototypeOf(this, TxVerifyError.prototype);
     this.kind = kind;
-    this.meta = meta;
+    /* istanbul ignore next */
     switch (this.kind) {
       case TxVerifyErrorKind.ScriptEval:
-        if (!this.meta) throw new Error('meta required for script evaluation error');
+        if (!(meta instanceof ScriptEvalError)) throw new Error('invalid error type for ScriptEvalError');
+        this.meta = meta;
         this.message = 'script eval: ' + this.meta.message;
         break;
       case TxVerifyErrorKind.ScriptHashMismatch:
@@ -399,5 +401,27 @@ export class TxVerifyError extends Error {
         const _exhaustiveCheck: never = this.kind;
         throw new Error(_exhaustiveCheck);
     }
+  }
+
+  public serialize(buf: ByteBuffer): void {
+    buf.writeUint8(this.kind);
+    if (this.kind === TxVerifyErrorKind.ScriptEval) {
+      const err = this.meta as ScriptEvalError;
+      buf.writeUint32(err.position);
+      buf.writeUint8(err.kind);
+    }
+  }
+
+  public static deserialize(buf: ByteBuffer): TxVerifyError {
+    const kind = buf.readUint8() as TxVerifyErrorKind;
+    if (!(kind in TxVerifyErrorKind)) throw new Error('invalid tx error kind');
+    let meta: Error | undefined;
+    if (kind === TxVerifyErrorKind.ScriptEval) {
+      const pos = buf.readUint32();
+      const evalErrKind = buf.readUint8() as ScriptEvalErrorKind;
+      if (!(evalErrKind in ScriptEvalErrorKind)) throw new Error('invalid script eval error kind');
+      meta = new ScriptEvalError(evalErrKind, pos);
+    }
+    return new TxVerifyError(kind, meta);
   }
 }

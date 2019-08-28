@@ -95,8 +95,10 @@ export class ScriptEvalError extends Error {
 
   public constructor(kind: ScriptEvalErrorKind, position: number) {
     super();
+    Object.setPrototypeOf(this, ScriptEvalError.prototype);
     this.position = position;
     this.kind = kind;
+    /* istanbul ignore next */
     switch (this.kind) {
       case ScriptEvalErrorKind.UnexpectedEOF:
         this.message = 'unexpected eof';

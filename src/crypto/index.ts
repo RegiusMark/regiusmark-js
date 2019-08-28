@@ -12,6 +12,7 @@ export class InvalidWif extends Error {
   public constructor(msg: string) {
     /* istanbul ignore next */
     super(msg);
+    Object.setPrototypeOf(this, InvalidWif.prototype);
   }
 }
 
