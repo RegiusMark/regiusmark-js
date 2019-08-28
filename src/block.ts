@@ -21,8 +21,8 @@ export class Block {
       this.block.header.serialize(buf);
       this.block.serializeData(buf);
     } else {
-      /* istanbul ignore next */
-      throw new Error('unknown block version');
+      const _exhaustiveCheck: never = this.block;
+      throw new Error(_exhaustiveCheck);
     }
     return buf;
   }
@@ -34,8 +34,8 @@ export class Block {
       const data = BlockV0.deserializeData(buf);
       return new Block(new BlockV0(header, data));
     } else {
-      /* istanbul ignore next */
-      throw new Error('unknown block header: ' + header);
+      const _exhaustiveCheck: never = header;
+      throw new Error(_exhaustiveCheck);
     }
   }
 }
@@ -91,8 +91,8 @@ export class BlockHeader {
     if (this.header instanceof BlockHeaderV0) {
       this.header.serialize(buf);
     } else {
-      /* istanbul ignore next */
-      throw new Error('unknown block header version');
+      const _exhaustiveCheck: never = this.header;
+      throw new Error(_exhaustiveCheck);
     }
   }
 

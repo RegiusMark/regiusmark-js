@@ -34,8 +34,8 @@ export class TxVariant {
       if (this.tx instanceof TxV0) {
         this.tx.signaturePairs.push(sig);
       } else {
-        /* istanbul ignore next */
-        throw new Error('unknown tx version');
+        const _exhaustiveCheck: never = this.tx;
+        throw new Error(_exhaustiveCheck);
       }
     }
     return sig;
@@ -48,8 +48,8 @@ export class TxVariant {
     if (this.tx instanceof TxV0) {
       buf.writeUint16(0x00);
     } else {
-      /* istanbul ignore next */
-      throw new Error('unknown tx version');
+      const _exhaustiveCheck: never = this.tx;
+      throw new Error(_exhaustiveCheck);
     }
 
     this.tx.serialize(buf, includeSigs);
@@ -112,7 +112,6 @@ export abstract class TxV0 {
   public static deserialize(buf: ByteBuffer): TxVariantV0 {
     const header = TxV0.deserializeHeader(buf);
 
-    /* istanbul ignore next */
     switch (header[0]) {
       case TxType.OWNER: {
         const data = OwnerTxV0.deserializeData(buf);
@@ -134,26 +133,16 @@ export abstract class TxV0 {
         header[1].signaturePairs = TxV0.deserializeSigs(buf);
         return new TransferTxV0(header[1], data);
       }
+      /* istanbul ignore next */
       default:
-        /* istanbul ignore next */
-        throw new Error('unknown tx type deserializing tx: ' + header[0]);
+        const _exhaustiveCheck: never = header[0];
+        throw new Error(_exhaustiveCheck);
     }
   }
 
   public static deserializeHeader(buf: ByteBuffer): [TxType, TxData] {
     const type = buf.readUint8() as TxType;
-    switch (type) {
-      case TxType.OWNER:
-        break;
-      case TxType.MINT:
-        break;
-      case TxType.REWARD:
-        break;
-      case TxType.TRANSFER:
-        break;
-      default:
-        throw new Error('unknown tx type deserializing header: ' + type);
-    }
+    if (!(type in TxType)) throw new Error('unknown tx type deserializing header: ' + type);
 
     const timestamp = buf.readUint64();
     const fee = TypeDeserializer.asset(buf);
