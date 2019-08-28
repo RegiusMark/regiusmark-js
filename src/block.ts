@@ -1,6 +1,6 @@
 import { TypeSerializer, TypeDeserializer } from './serializer';
+import { SigPair, doubleSha256, KeyPair } from './crypto';
 import { ByteBuffer } from './bytebuffer';
-import { SigPair } from './crypto';
 import { TxVariant } from './tx';
 import Long from 'long';
 
@@ -14,29 +14,28 @@ export class Block {
     this.block = block;
   }
 
+  public sign(signer: KeyPair): void {
+    const hash = this.block.header.calcHash();
+    this.block.signer = signer.sign(hash);
+  }
+
+  public verifyHash(prevBlock: Block): boolean {
+    const thisHash = this.block.header.previousHash;
+    const prevHash = prevBlock.block.header.calcHash();
+    return Buffer.compare(thisHash, prevHash) === 0;
+  }
+
   public serialize(buf?: ByteBuffer): ByteBuffer {
     if (!buf) buf = ByteBuffer.alloc(1_048_576);
-    /* istanbul ignore next */
-    if (this.block instanceof BlockV0) {
-      this.block.header.serialize(buf);
-      this.block.serializeData(buf);
-    } else {
-      const _exhaustiveCheck: never = this.block;
-      throw new Error(_exhaustiveCheck);
-    }
+    this.block.header.serialize(buf);
+    this.block.serializeData(buf);
     return buf;
   }
 
   public static deserialize(buf: ByteBuffer): Block {
     const header = BlockHeader.deserialize(buf).header;
-    /* istanbul ignore next */
-    if (header instanceof BlockHeaderV0) {
-      const data = BlockV0.deserializeData(buf);
-      return new Block(new BlockV0(header, data));
-    } else {
-      const _exhaustiveCheck: never = header;
-      throw new Error(_exhaustiveCheck);
-    }
+    const data = BlockV0.deserializeData(buf);
+    return new Block(new BlockV0(header, data));
   }
 }
 
@@ -86,14 +85,18 @@ export class BlockHeader {
     this.header = header;
   }
 
+  public verifyHash(prevHeader: BlockHeader): boolean {
+    const thisHash = this.header.previousHash;
+    const prevHash = prevHeader.calcHash();
+    return Buffer.compare(thisHash, prevHash) === 0;
+  }
+
+  public calcHash(): Uint8Array {
+    return this.header.calcHash();
+  }
+
   public serialize(buf: ByteBuffer): void {
-    /* istanbul ignore next */
-    if (this.header instanceof BlockHeaderV0) {
-      this.header.serialize(buf);
-    } else {
-      const _exhaustiveCheck: never = this.header;
-      throw new Error(_exhaustiveCheck);
-    }
+    this.header.serialize(buf);
   }
 
   public static deserialize(buf: ByteBuffer): BlockHeader {
@@ -125,6 +128,12 @@ export class BlockHeaderV0 implements BlockHeaderDataV0 {
     this.height = data.height;
     this.timestamp = data.timestamp;
     this.txMerkleRoot = data.txMerkleRoot;
+  }
+
+  public calcHash(): Uint8Array {
+    const buf = ByteBuffer.alloc(128);
+    this.serialize(buf);
+    return doubleSha256(buf.sharedView());
   }
 
   public serialize(buf: ByteBuffer): void {

@@ -13,7 +13,6 @@ import {
   BlockHeaderV0,
   doubleSha256,
   BlockHeader,
-  SigPair,
 } from '../../src';
 import Long from 'long';
 
@@ -132,13 +131,7 @@ test('serialize get block response', (): void => {
       },
     ),
   );
-
-  {
-    // Sign the block
-    const buf = ByteBuffer.alloc(256);
-    block.block.header.serialize(buf);
-    block.block.signer = minter.sign(buf.sharedView());
-  }
+  block.sign(minter);
 
   const res = new Response(1, {
     type: BodyType.GetBlock,
@@ -181,14 +174,7 @@ test('serialize get block filtered response', (): void => {
       txMerkleRoot: doubleSha256(new Uint8Array([4, 5, 6])),
     }),
   );
-
-  let signer: SigPair;
-  {
-    // Sign the block
-    const buf = ByteBuffer.alloc(256);
-    header.serialize(buf);
-    signer = minter.sign(buf.sharedView());
-  }
+  const signer = minter.sign(header.calcHash());
 
   const res = new Response(1, {
     type: BodyType.GetBlock,
@@ -231,14 +217,7 @@ test('serialize get block header response', (): void => {
       txMerkleRoot: doubleSha256(new Uint8Array([4, 5, 6])),
     }),
   );
-
-  let signer: SigPair;
-  {
-    // Sign the block
-    const buf = ByteBuffer.alloc(256);
-    header.serialize(buf);
-    signer = minter.sign(buf.sharedView());
-  }
+  const signer = minter.sign(header.calcHash());
 
   const res = new Response(1, {
     type: BodyType.GetBlockHeader,
