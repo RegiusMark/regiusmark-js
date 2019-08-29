@@ -57,6 +57,26 @@ test('serialize set block filter response', (): void => {
   expect(Response.deserialize(buf)).toStrictEqual(res);
 });
 
+test('serialize subscribe response', (): void => {
+  const res = new Response(0, {
+    type: BodyType.Subscribe,
+  });
+  const buf = ByteBuffer.alloc(128);
+  res.serialize(buf);
+  buf.resetOffset();
+  expect(Response.deserialize(buf)).toStrictEqual(res);
+});
+
+test('serialize unsubscribe response', (): void => {
+  const res = new Response(0, {
+    type: BodyType.Unsubscribe,
+  });
+  const buf = ByteBuffer.alloc(128);
+  res.serialize(buf);
+  buf.resetOffset();
+  expect(Response.deserialize(buf)).toStrictEqual(res);
+});
+
 test('serialize get properties response', (): void => {
   const minter = generateKeyPair();
   const wallet = generateKeyPair();

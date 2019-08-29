@@ -9,6 +9,8 @@ export enum BodyType {
   // Operations that can update the connection or blockchain state
   Broadcast = 0x10,
   SetBlockFilter = 0x11,
+  Subscribe = 0x12,
+  Unsubscribe = 0x13,
 
   // Getters
   GetProperties = 0x20,

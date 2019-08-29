@@ -11,6 +11,8 @@ export type ResponseBody =
   | ErrorRes
   | BroadcastRes
   | SetBlockFilterRes
+  | SubscribeRes
+  | UnsubscribeRes
   | GetPropertiesRes
   | GetBlockRes
   | GetBlockHeaderRes
@@ -37,6 +39,10 @@ export class Response {
       case BodyType.Broadcast:
         break;
       case BodyType.SetBlockFilter:
+        break;
+      case BodyType.Subscribe:
+        break;
+      case BodyType.Unsubscribe:
         break;
       case BodyType.GetProperties: {
         const props = this.body.properties;
@@ -96,6 +102,18 @@ export class Response {
       case BodyType.SetBlockFilter: {
         const body: SetBlockFilterRes = {
           type: BodyType.SetBlockFilter,
+        };
+        return new Response(id, body);
+      }
+      case BodyType.Subscribe: {
+        const body: SubscribeRes = {
+          type: BodyType.Subscribe,
+        };
+        return new Response(id, body);
+      }
+      case BodyType.Unsubscribe: {
+        const body: UnsubscribeRes = {
+          type: BodyType.Unsubscribe,
         };
         return new Response(id, body);
       }
@@ -181,6 +199,14 @@ export interface BroadcastRes {
 
 export interface SetBlockFilterRes {
   type: BodyType.SetBlockFilter;
+}
+
+export interface SubscribeRes {
+  type: BodyType.Subscribe;
+}
+
+export interface UnsubscribeRes {
+  type: BodyType.Unsubscribe;
 }
 
 export interface GetPropertiesRes {

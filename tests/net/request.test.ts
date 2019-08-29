@@ -83,6 +83,28 @@ test('serialize set block filter request with no addresses', (): void => {
   expect(Request.deserialize(buf)).toStrictEqual(req);
 });
 
+test('serialize subscribe request', (): void => {
+  const req = new Request(0, {
+    type: BodyType.Subscribe,
+  });
+
+  const buf = ByteBuffer.alloc(4096);
+  req.serialize(buf);
+  buf.resetOffset();
+  expect(Request.deserialize(buf)).toStrictEqual(req);
+});
+
+test('serialize unsubscribe request', (): void => {
+  const req = new Request(0, {
+    type: BodyType.Unsubscribe,
+  });
+
+  const buf = ByteBuffer.alloc(4096);
+  req.serialize(buf);
+  buf.resetOffset();
+  expect(Request.deserialize(buf)).toStrictEqual(req);
+});
+
 test('serialize get properties request', (): void => {
   const req = new Request(0, {
     type: BodyType.GetProperties,

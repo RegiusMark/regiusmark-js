@@ -8,6 +8,8 @@ import Long from 'long';
 export type RequestBody =
   | BroadcastReq
   | SetBlockFilterReq
+  | SubscribeReq
+  | UnsubscribeReq
   | GetPropertiesReq
   | GetBlockReq
   | GetBlockHeaderReq
@@ -41,6 +43,12 @@ export class Request {
             TypeSerializer.digest(buf, addr);
           }
         }
+        break;
+      case BodyType.Subscribe:
+        // No properties to serialize
+        break;
+      case BodyType.Unsubscribe:
+        // No properties to serialize
         break;
       case BodyType.GetProperties:
         // No properties to serialize
@@ -92,6 +100,18 @@ export class Request {
         };
         return new Request(id, req);
       }
+      case BodyType.Subscribe: {
+        const req: SubscribeReq = {
+          type: BodyType.Subscribe,
+        };
+        return new Request(id, req);
+      }
+      case BodyType.Unsubscribe: {
+        const req: UnsubscribeReq = {
+          type: BodyType.Unsubscribe,
+        };
+        return new Request(id, req);
+      }
       case BodyType.GetProperties: {
         const req: GetPropertiesReq = {
           type: BodyType.GetProperties,
@@ -139,6 +159,14 @@ export interface SetBlockFilterReq {
   type: BodyType.SetBlockFilter;
   /// Setting to undefined will remove any applied filter
   addrs: ScriptHash[] | undefined;
+}
+
+export interface SubscribeReq {
+  type: BodyType.Subscribe;
+}
+
+export interface UnsubscribeReq {
+  type: BodyType.Unsubscribe;
 }
 
 export interface GetPropertiesReq {
