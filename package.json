@@ -11,7 +11,7 @@
     "dist/**"
   ],
   "scripts": {
-    "prepack": "$npm_execpath run build:prod",
+    "prepare": "$npm_execpath run build:prod",
     "test": "npx jest",
     "build": "npx webpack --config webpack.dev.js",
     "build:prod": "npx webpack --config webpack.prod.js",
