@@ -17,6 +17,10 @@
     "build:prod": "webpack --config webpack.prod.js",
     "lint": "eslint './src/**' './tests/**'"
   },
+  "peerDependencies": {
+    "@types/big.js": "^4.0.5",
+    "@types/long": "^4.0.0"
+  },
   "dependencies": {
     "big.js": "^5.2.2",
     "bs58": "^4.0.1",
