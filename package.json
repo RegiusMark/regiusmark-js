@@ -12,9 +12,9 @@
   ],
   "scripts": {
     "prepare": "$npm_execpath run build:prod",
-    "test": "npx jest",
-    "build": "npx webpack --config webpack.dev.js",
-    "build:prod": "npx webpack --config webpack.prod.js",
+    "test": "jest",
+    "build": "webpack --config webpack.dev.js",
+    "build:prod": "webpack --config webpack.prod.js",
     "lint": "eslint './src/**' './tests/**'"
   },
   "dependencies": {
