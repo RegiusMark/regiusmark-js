@@ -86,7 +86,7 @@ export class Asset {
     return this.amount.eq(other.amount);
   }
 
-  public toString(): string {
+  public toString(includeSymbol: boolean = true): string {
     let amount = this.amount.toFixed(0);
     const negative = this.amount.lt(0);
     if (negative) amount = amount.substring(1);
@@ -95,7 +95,8 @@ export class Asset {
     let decimals = amount.substring(amount.length - Asset.MAX_PRECISION);
     decimals = (int ? '.' : '0.') + '0'.repeat(Asset.MAX_PRECISION - decimals.length) + decimals;
 
-    return `${negative ? '-' : ''}${int}${decimals} ${ASSET_SYMBOL}`;
+    const symbol = includeSymbol ? ' ' + ASSET_SYMBOL : '';
+    return `${negative ? '-' : ''}${int}${decimals}${symbol}`;
   }
 }
 

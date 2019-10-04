@@ -49,7 +49,9 @@ test('fail parsing invalid input', (): void => {
 
 test('asset to string', (): void => {
   const c = (asset: string, s: string): void => {
-    expect(Asset.fromString(asset).toString()).toBe(s);
+    const a = Asset.fromString(asset);
+    expect(a.toString()).toBe(s);
+    expect(a.toString(false)).toBe(s.split(' ')[0]);
   };
   c('1.00001 GRAEL', '1.00001 GRAEL');
   c('0.00001 GRAEL', '0.00001 GRAEL');
