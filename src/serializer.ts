@@ -8,7 +8,7 @@ import Long from 'long';
 
 export class TypeSerializer {
   public static buffer(buf: ByteBuffer, value: Uint8Array): void {
-    let len = value.byteLength;
+    const len = value.byteLength;
     buf.writeUint32(len);
     buf.writeBytes(value);
   }
@@ -41,7 +41,7 @@ export class TypeSerializer {
   }
 
   public static asset(buf: ByteBuffer, value: Asset): void {
-    let num = Long.fromString(value.amount.toFixed(0), false);
+    const num = Long.fromString(value.amount.toFixed(0), false);
     buf.writeVarI64ZigZag(num);
   }
 }

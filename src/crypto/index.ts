@@ -1,7 +1,5 @@
 import { KeyPair, PrivateKey, PublicKey } from './key';
 import { randomBytes, sign } from 'tweetnacl';
-
-//@ts-ignore
 import Sha256 from 'sha.js/sha256';
 
 export { KeyPair, PrivateKey, PublicKey };

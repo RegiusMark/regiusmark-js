@@ -26,7 +26,7 @@ export class TxVariant {
     this.tx = tx;
   }
 
-  public sign(keyPair: KeyPair, append: boolean = true): SigPair {
+  public sign(keyPair: KeyPair, append = true): SigPair {
     const buf = this.serialize(undefined, false);
     const sig = keyPair.sign(buf.sharedView());
     if (append) {
@@ -91,7 +91,7 @@ export abstract class TxV0 {
 
   public abstract serializeData(buf: ByteBuffer): void;
 
-  public serialize(buf: ByteBuffer, includeSigs: boolean = true): void {
+  public serialize(buf: ByteBuffer, includeSigs = true): void {
     this.serializeHeader(buf);
     this.serializeData(buf);
 

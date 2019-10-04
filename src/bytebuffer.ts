@@ -12,7 +12,7 @@ export class ByteBuffer {
 
   private buffer: Uint8Array;
   private view: DataView;
-  private _offset: number = 0;
+  private _offset = 0;
 
   public get capacity(): number {
     return this.buffer.byteLength;

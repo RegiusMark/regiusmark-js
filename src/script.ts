@@ -66,7 +66,7 @@ export class ScriptBuilder {
     TypeSerializer.publicKey(this.bytes, key);
   }
 
-  public pushCheckMultiSig(threshold: number, keyCount: number, fastFail: boolean = false): void {
+  public pushCheckMultiSig(threshold: number, keyCount: number, fastFail = false): void {
     this.assertNotBuilt();
     if (fastFail) this.push(Operand.OpCheckMultiSigFastFail);
     else this.push(Operand.OpCheckMultiSig);

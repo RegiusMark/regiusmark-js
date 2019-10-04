@@ -86,7 +86,7 @@ export class Asset {
     return this.amount.eq(other.amount);
   }
 
-  public toString(includeSymbol: boolean = true): string {
+  public toString(includeSymbol = true): string {
     let amount = this.amount.toFixed(0);
     const negative = this.amount.lt(0);
     if (negative) amount = amount.substring(1);
