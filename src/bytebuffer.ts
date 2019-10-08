@@ -1,13 +1,20 @@
+import { Buffer } from 'buffer';
 import Long from 'long';
 
 export class ByteBuffer {
   public static alloc(capacity: number): ByteBuffer {
     const buf = new Uint8Array(capacity);
-    return new ByteBuffer(buf);
+    return new ByteBuffer(buf, new DataView(buf.buffer));
   }
 
-  public static from(buffer: Uint8Array): ByteBuffer {
-    return new ByteBuffer(buffer);
+  public static from(buffer: Buffer | Uint8Array): ByteBuffer {
+    if (Buffer.isBuffer(buffer)) {
+      const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.length);
+      return new ByteBuffer(buffer, view);
+    } else {
+      const view = new DataView(buffer.buffer);
+      return new ByteBuffer(buffer, view);
+    }
   }
 
   private buffer: Uint8Array;
@@ -29,9 +36,9 @@ export class ByteBuffer {
     this._offset = newOffset;
   }
 
-  private constructor(buffer: Uint8Array) {
+  private constructor(buffer: Uint8Array, view: DataView) {
     this.buffer = buffer;
-    this.view = new DataView(buffer.buffer);
+    this.view = view;
   }
 
   public sharedView(): Uint8Array {

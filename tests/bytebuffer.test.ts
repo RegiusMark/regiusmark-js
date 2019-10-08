@@ -117,3 +117,17 @@ test('buffer var i64 serialization eof', (): void => {
     buf.readVarI64ZigZag();
   }).toThrowError(new RangeError('Offset is outside the bounds of the DataView'));
 });
+
+test('byte buffer from node buffer', (): void => {
+  function testBuf(nodeBuffer: Buffer): void {
+    const buf = ByteBuffer.from(nodeBuffer);
+    buf.offset = 4;
+    expect(new Uint8Array(buf.sharedView())).toEqual(new Uint8Array([0xff, 0xff, 0xff, 0xff]));
+
+    buf.resetOffset();
+    expect(buf.readUint32()).toEqual(0xffff_ffff);
+  }
+
+  testBuf(Buffer.from([0xff, 0xff, 0xff, 0xff]));
+  testBuf(Buffer.from(new Uint8Array([0xff, 0xff, 0xff, 0xff])));
+});
