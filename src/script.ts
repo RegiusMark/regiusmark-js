@@ -34,7 +34,7 @@ export class Script {
   }
 
   public hash(): ScriptHash {
-    return doubleSha256(this.bytes);
+    return new ScriptHash(doubleSha256(this.bytes));
   }
 }
 

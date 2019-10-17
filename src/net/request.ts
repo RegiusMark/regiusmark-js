@@ -40,7 +40,7 @@ export class Request {
         } else {
           buf.writeUint8(this.body.addrs.length);
           for (const addr of this.body.addrs) {
-            TypeSerializer.digest(buf, addr);
+            TypeSerializer.digest(buf, addr.bytes);
           }
         }
         break;
@@ -60,7 +60,7 @@ export class Request {
         buf.writeUint64(this.body.height);
         break;
       case BodyType.GetAddressInfo:
-        TypeSerializer.digest(buf, this.body.addr);
+        TypeSerializer.digest(buf, this.body.addr.bytes);
         break;
       /* istanbul ignore next */
       default:
@@ -91,7 +91,7 @@ export class Request {
         if (addrLen > 0) {
           addrs = [];
           for (let i = 0; i < addrLen; ++i) {
-            addrs.push(TypeDeserializer.digest(buf));
+            addrs.push(new ScriptHash(TypeDeserializer.digest(buf)));
           }
         }
         const req: SetBlockFilterReq = {
@@ -135,7 +135,7 @@ export class Request {
         return new Request(id, req);
       }
       case BodyType.GetAddressInfo: {
-        const addr = TypeDeserializer.digest(buf);
+        const addr = new ScriptHash(TypeDeserializer.digest(buf));
         const req: GetAddressInfoReq = {
           type: BodyType.GetAddressInfo,
           addr,

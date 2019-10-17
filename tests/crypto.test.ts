@@ -1,4 +1,4 @@
-import { generateKeyPair, KeyPair, PublicKey, PrivateKey, InvalidWif } from '../src';
+import { generateKeyPair, KeyPair, PublicKey, PrivateKey, InvalidWif, ScriptHash } from '../src';
 import { PUB_ADDRESS_PREFIX } from '../src/crypto/key';
 import { verify } from 'tweetnacl';
 import bs58 from 'bs58';
@@ -44,6 +44,15 @@ test('import keys from WIF', (): void => {
   const { privateKey, publicKey } = KeyPair.fromWif('3GAD3otqozDorfu1iDpMQJ1gzWp8PRFEjVHZivZdedKW3i3KtM');
   expect(privateKey.toWif()).toBe('3GAD3otqozDorfu1iDpMQJ1gzWp8PRFEjVHZivZdedKW3i3KtM');
   expect(publicKey.toWif()).toBe('GOD52QZDBUStV5CudxvKf6bPsQeN7oeKTkEm2nAU1vAUqNVexGTb8');
+});
+
+test('import p2sh from wif', (): void => {
+  const { publicKey } = KeyPair.fromWif('3GAD3otqozDorfu1iDpMQJ1gzWp8PRFEjVHZivZdedKW3i3KtM');
+  const wif = 'GOD78WVbdCHAwEVajuPKprZ6je6t1zvTieLEsEcKiYVtTjbpfjqLR';
+
+  const hash = ScriptHash.fromWif(wif);
+  expect(hash.toWif()).toBe(wif);
+  expect(publicKey.toScript().hash()).toEqual(hash);
 });
 
 test('throw on invalid key', (): void => {

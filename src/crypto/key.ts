@@ -8,7 +8,7 @@ export const PRIV_BUF_PREFIX = 0x01;
 export const PUB_BUF_PREFIX = 0x02;
 export const PUB_ADDRESS_PREFIX = 'GOD';
 
-function wifToArray(wif: string, prefix: number): Uint8Array {
+export function wifToArray(wif: string, prefix: number): Uint8Array {
   if (!wif) {
     throw new InvalidWif('wif not provided');
   }
