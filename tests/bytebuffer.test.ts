@@ -118,7 +118,7 @@ test('buffer var i64 serialization eof', (): void => {
   }).toThrowError(new RangeError('Offset is outside the bounds of the DataView'));
 });
 
-test('byte buffer from node buffer', (): void => {
+test('byte buffer has correct data view from node buffer', (): void => {
   function testBuf(nodeBuffer: Buffer): void {
     const buf = ByteBuffer.from(nodeBuffer);
     buf.offset = 4;
@@ -126,8 +126,36 @@ test('byte buffer from node buffer', (): void => {
 
     buf.resetOffset();
     expect(buf.readUint32()).toEqual(0xffff_ffff);
+
+    buf.resetOffset();
+    const bytes = buf.readBytes(4);
+    for (let i = 0; i < 4; ++i) {
+      expect(bytes[i]).toBe(0xff);
+    }
   }
 
   testBuf(Buffer.from([0xff, 0xff, 0xff, 0xff]));
   testBuf(Buffer.from(new Uint8Array([0xff, 0xff, 0xff, 0xff])));
+});
+
+test('byte buffer can read string from node buffer', (): void => {
+  const str = 'aaaa';
+
+  function testBuf(nodeBuffer: Buffer): void {
+    const buf = ByteBuffer.from(nodeBuffer);
+    expect(buf.readUTF8String(str.length)).toEqual(str);
+  }
+
+  testBuf(Buffer.from(str, 'utf8'));
+  testBuf(Buffer.from([0x61, 0x61, 0x61, 0x61]));
+  testBuf(Buffer.from(new Uint8Array([0x61, 0x61, 0x61, 0x61])));
+});
+
+test('byte buffer can write string backed by node buffer', (): void => {
+  const str = 'aaaa';
+
+  const buf = ByteBuffer.from(Buffer.from([0, 0, 0, 0]));
+  buf.writeUTF8String(str);
+  buf.resetOffset();
+  expect(buf.readUTF8String(str.length)).toEqual(str);
 });

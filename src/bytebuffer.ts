@@ -85,7 +85,9 @@ export class ByteBuffer {
   }
 
   public readUTF8String(len: number): string {
-    const buf = Buffer.from(this.buffer.buffer, this._offset, len);
+    // Calculate using the view byteOffset as we need to access a potentially shared array and the view already has the
+    // correct offsets needed to properly read the array.
+    const buf = Buffer.from(this.buffer.buffer, this.view.byteOffset + this._offset, len);
     this._offset += len;
     return buf.toString('utf8');
   }
