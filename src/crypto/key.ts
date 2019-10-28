@@ -110,6 +110,10 @@ export class PublicKey extends Key {
 export class KeyPair {
   public static fromWif(wif: string): KeyPair {
     const seed = wifToArray(wif, PRIV_BUF_PREFIX);
+    return KeyPair.fromSeed(seed);
+  }
+
+  public static fromSeed(seed: Uint8Array): KeyPair {
     const keys = sign.keyPair.fromSeed(seed);
 
     const sk = new PrivateKey(keys.secretKey, seed);
