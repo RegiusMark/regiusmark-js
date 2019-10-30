@@ -5,6 +5,9 @@ import { ByteBuffer } from './bytebuffer';
 import { Asset } from './asset';
 import Long from 'long';
 
+export const MAX_MEMO_BYTE_SIZE = 1024;
+export const MAX_TX_SIGNATURES = 8;
+
 export enum TxType {
   OWNER = 0x00,
   MINT = 0x01,
