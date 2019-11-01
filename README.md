@@ -1,15 +1,15 @@
-# GODcoin
-[![Build Status](https://travis-ci.com/GODcoin/godcoin-js.svg?branch=master)](https://travis-ci.com/GODcoin/godcoin-js)
+# Regius Mark
+[![Build Status](https://travis-ci.com/RegiusMark/regiusmark-js.svg?branch=master)](https://travis-ci.com/RegiusMark/regiusmark-js)
 
-https://godcoin.gold
+https://regiusmark.io
 
-## What is GODcoin?
+## What is Regius Mark?
 
-GODcoin is the official currency of Christ. GODcoin is backed by physical gold
-assets. The digital token name is represented as GRAEL. A single token will be
-represented by a gram of gold.
+Regius Mark is a cryptocurrency that is backed by physical gold assets. The
+digital token name is represented as MARK. A single token will be represented by
+a gram of gold.
 
-For more information see the [whitepaper](https://godcoin.gold/whitepaper).
+For more information see the [whitepaper](https://regiusmark.io/whitepaper).
 
 ## Development
 

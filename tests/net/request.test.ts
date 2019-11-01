@@ -26,14 +26,14 @@ test('serialize broadcast request', (): void => {
     new MintTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100.00000 GRAEL'),
+        amount: Asset.fromString('100.00000 MARK'),
         attachment: new Uint8Array([1, 2, 3, 4]),
         attachmentName: 'hello_world.txt',
         script: generateKeyPair().publicKey.toScript(),

@@ -1,8 +1,8 @@
 {
-  "name": "godcoin",
+  "name": "regiusmark",
   "version": "0.1.0",
-  "description": "GODcoin library",
-  "repository": "https://github.com/GODcoin/godcoin-js",
+  "description": "Regius Mark library",
+  "repository": "https://github.com/RegiusMark/regiusmark-js",
   "author": "Samuel Grenier <samrg472@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",

@@ -6,7 +6,7 @@ import bs58 from 'bs58';
 
 export const PRIV_BUF_PREFIX = 0x01;
 export const PUB_BUF_PREFIX = 0x02;
-export const PUB_ADDRESS_PREFIX = 'GOD';
+export const PUB_ADDRESS_PREFIX = 'RGM';
 
 export function wifToArray(wif: string, prefix: number): Uint8Array {
   if (!wif) {

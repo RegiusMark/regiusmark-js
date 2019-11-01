@@ -43,12 +43,12 @@ test('recreate keys from a WIF', (): void => {
 test('import keys from WIF', (): void => {
   const { privateKey, publicKey } = KeyPair.fromWif('3GAD3otqozDorfu1iDpMQJ1gzWp8PRFEjVHZivZdedKW3i3KtM');
   expect(privateKey.toWif()).toBe('3GAD3otqozDorfu1iDpMQJ1gzWp8PRFEjVHZivZdedKW3i3KtM');
-  expect(publicKey.toWif()).toBe('GOD52QZDBUStV5CudxvKf6bPsQeN7oeKTkEm2nAU1vAUqNVexGTb8');
+  expect(publicKey.toWif()).toBe('RGM52QZDBUStV5CudxvKf6bPsQeN7oeKTkEm2nAU1vAUqNVexGTb8');
 });
 
 test('import p2sh from wif', (): void => {
   const { publicKey } = KeyPair.fromWif('3GAD3otqozDorfu1iDpMQJ1gzWp8PRFEjVHZivZdedKW3i3KtM');
-  const wif = 'GOD78WVbdCHAwEVajuPKprZ6je6t1zvTieLEsEcKiYVtTjbpfjqLR';
+  const wif = 'RGM78WVbdCHAwEVajuPKprZ6je6t1zvTieLEsEcKiYVtTjbpfjqLR';
 
   const hash = ScriptHash.fromWif(wif);
   expect(hash.toWif()).toBe(wif);
@@ -70,7 +70,7 @@ test('throw on invalid key', (): void => {
   expect((): void => {
     // Private key and public key has a different prefix
     const buf = bs58.decode(keys.privateKey.toWif());
-    PublicKey.fromWif('GOD' + bs58.encode(buf));
+    PublicKey.fromWif('RGM' + bs58.encode(buf));
   }).toThrowError(new InvalidWif('invalid prefix'));
 
   expect((): void => {

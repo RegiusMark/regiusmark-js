@@ -81,7 +81,7 @@ test('serialize block v0', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -179,7 +179,7 @@ test('fail to serialize invalid digest length', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {

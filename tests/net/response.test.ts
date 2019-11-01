@@ -85,7 +85,7 @@ test('serialize get properties response', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -104,8 +104,8 @@ test('serialize get properties response', (): void => {
     properties: {
       height: Long.fromNumber(123, true),
       owner,
-      networkFee: Asset.fromString('1.12345 GRAEL'),
-      tokenSupply: Asset.fromString('123456.00000 GRAEL'),
+      networkFee: Asset.fromString('1.12345 MARK'),
+      tokenSupply: Asset.fromString('123456.00000 MARK'),
     },
   });
 
@@ -123,7 +123,7 @@ test('serialize get block response', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -172,7 +172,7 @@ test('serialize get block filtered response', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -215,7 +215,7 @@ test('serialize get block header response', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -254,9 +254,9 @@ test('serialize get address info response', (): void => {
   const res = new Response(2, {
     type: BodyType.GetAddressInfo,
     info: {
-      netFee: Asset.fromString('1.00000 GRAEL'),
-      addrFee: Asset.fromString('0.00010 GRAEL'),
-      balance: Asset.fromString('100000000.00000 GRAEL'),
+      netFee: Asset.fromString('1.00000 MARK'),
+      addrFee: Asset.fromString('0.00010 MARK'),
+      balance: Asset.fromString('100000000.00000 MARK'),
     },
   });
 

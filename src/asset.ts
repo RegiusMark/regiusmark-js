@@ -4,7 +4,7 @@ const big = Big();
 big.DP = 0;
 big.RM = 0;
 
-export const ASSET_SYMBOL = 'GRAEL';
+export const ASSET_SYMBOL = 'MARK';
 
 export class Asset {
   public static readonly MAX_STR_LEN = 26;
@@ -100,7 +100,7 @@ export class Asset {
   }
 }
 
-export const EMPTY_GRAEL = new Asset(big(0));
+export const EMPTY_MARK = new Asset(big(0));
 
 export class AssetParseError extends Error {
   public constructor(msg: string) {

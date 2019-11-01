@@ -23,7 +23,7 @@ test('serialize owner tx v0', (): void => {
     new OwnerTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -47,14 +47,14 @@ test('serialize mint tx v0', (): void => {
     new MintTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100.00000 GRAEL'),
+        amount: Asset.fromString('100.00000 MARK'),
         attachment: new Uint8Array([1, 2, 3, 4]),
         attachmentName: 'hello_world.txt',
         script: generateKeyPair().publicKey.toScript(),
@@ -75,14 +75,14 @@ test('serialize mint tx v0 with empty attachment name', (): void => {
     new MintTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100.00000 GRAEL'),
+        amount: Asset.fromString('100.00000 MARK'),
         attachment: new Uint8Array([1, 2, 3, 4]),
         attachmentName: '',
         script: generateKeyPair().publicKey.toScript(),
@@ -103,14 +103,14 @@ test('serialize reward tx v0', (): void => {
     new RewardTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        rewards: Asset.fromString('123.45678 GRAEL'),
+        rewards: Asset.fromString('123.45678 MARK'),
       },
     ),
   );
@@ -125,7 +125,7 @@ test('serialize transfer tx v0', (): void => {
     new TransferTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -135,7 +135,7 @@ test('serialize transfer tx v0', (): void => {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100000.00000 GRAEL'),
+        amount: Asset.fromString('100000.00000 MARK'),
         script: generateKeyPair().publicKey.toScript(),
         memo: new Uint8Array([0x00, 0x10, 0x20, 0x30, 0x50, 0xaa, 0xff]),
       },
@@ -152,7 +152,7 @@ test('serialize transfer tx v0 with custom buffer', (): void => {
     new TransferTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -162,7 +162,7 @@ test('serialize transfer tx v0 with custom buffer', (): void => {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100000.00000 GRAEL'),
+        amount: Asset.fromString('100000.00000 MARK'),
         script: generateKeyPair().publicKey.toScript(),
         memo: new Uint8Array([0x00, 0x10, 0x20, 0x30, 0x50, 0xaa, 0xff]),
       },
@@ -181,7 +181,7 @@ test('serialize transfer tx v0 with empty memo', (): void => {
     new TransferTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -191,7 +191,7 @@ test('serialize transfer tx v0 with empty memo', (): void => {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100000.00000 GRAEL'),
+        amount: Asset.fromString('100000.00000 MARK'),
         script: generateKeyPair().publicKey.toScript(),
         memo: new Uint8Array(0),
       },
@@ -208,7 +208,7 @@ test('sign and verify transfer tx v0', (): void => {
     new TransferTxV0(
       {
         timestamp: Long.fromNumber(12345, true),
-        fee: Asset.fromString('1.00000 GRAEL'),
+        fee: Asset.fromString('1.00000 MARK'),
         signaturePairs: [],
       },
       {
@@ -218,7 +218,7 @@ test('sign and verify transfer tx v0', (): void => {
         to: generateKeyPair()
           .publicKey.toScript()
           .hash(),
-        amount: Asset.fromString('100000.00000 GRAEL'),
+        amount: Asset.fromString('100000.00000 MARK'),
         script: generateKeyPair().publicKey.toScript(),
         memo: new Uint8Array([0x00, 0x10, 0x20, 0x30, 0x50, 0xaa, 0xff]),
       },
@@ -241,7 +241,7 @@ test('fail to create tx with signed timestamp', (): void => {
       new OwnerTxV0(
         {
           timestamp: Long.fromNumber(12345, false),
-          fee: Asset.fromString('1.00000 GRAEL'),
+          fee: Asset.fromString('1.00000 MARK'),
           signaturePairs: [],
         },
         {

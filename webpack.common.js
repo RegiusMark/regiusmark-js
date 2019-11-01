@@ -18,7 +18,7 @@ const common = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
-    library: 'godcoin',
+    library: 'regiusmark',
     libraryTarget: 'umd',
     globalObject: 'this',
   },
