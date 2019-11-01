@@ -70,7 +70,7 @@ test('throw on invalid key', (): void => {
   expect((): void => {
     // Private key and public key has a different prefix
     const buf = bs58.decode(keys.privateKey.toWif());
-    PublicKey.fromWif('GOD' + bs58.encode(buf));
+    PublicKey.fromWif(PUB_ADDRESS_PREFIX + bs58.encode(buf));
   }).toThrowError(new InvalidWif('invalid prefix'));
 
   expect((): void => {
