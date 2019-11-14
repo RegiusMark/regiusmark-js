@@ -1,17 +1,42 @@
 # GODcoin
+
+GODcoin is the official currency of Christ. A single token is backed by one
+physical gram of gold. Blockchain technology is used to provide an immutable and
+cryptographically verified ledger. The system is centralized allowing for global
+scalability that would otherwise be foregone in a decentralized system.
+
+[Website](https://godcoin.gold) |
+[Whitepaper](https://godcoin.gold/whitepaper)
+
+## Overview
+
+The GODcoin library for JavaScript written in TypeScript. This library is
+intended to be compatible with NodeJS and browsers.
+
 [![Build Status](https://travis-ci.com/GODcoin/godcoin-js.svg?branch=master)](https://travis-ci.com/GODcoin/godcoin-js)
-
-https://godcoin.gold
-
-## What is GODcoin?
-
-GODcoin is the official currency of Christ. GODcoin is backed by physical gold
-assets. The digital token name is represented as GRAEL. A single token will be
-represented by a gram of gold.
-
-For more information see the [whitepaper](https://godcoin.gold/whitepaper).
 
 ## Development
 
-This is the JavaScript library intended to be compatible with browsers and
-NodeJS. The current status of this library is feature incomplete.
+NPM or Yarn can be used to test and develop the library.
+
+Install dependencies:
+```
+$ npm install
+```
+
+Run the test suite:
+```
+$ npm run test
+```
+
+### Building
+
+Build for development:
+```
+$ npm run build
+```
+
+Build for production:
+```
+$ npm run build:prod
+```
