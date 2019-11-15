@@ -32,7 +32,6 @@ const node = merge(common, {
   externals: {
     'big.js': 'big.js',
     'bs58': 'bs58',
-    'bytebuffer': 'bytebuffer',
     'long': 'long',
     'sha.js': 'sha.js',
     'tweetnacl': 'tweetnacl'
