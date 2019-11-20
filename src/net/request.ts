@@ -8,11 +8,13 @@ import Long from 'long';
 export type RequestBody =
   | BroadcastReq
   | SetBlockFilterReq
+  | ClearBlockFilterReq
   | SubscribeReq
   | UnsubscribeReq
   | GetPropertiesReq
   | GetBlockReq
-  | GetBlockHeaderReq
+  | GetFullBlockReq
+  | GetBlockRangeReq
   | GetAddressInfoReq;
 
 export class Request {
@@ -44,6 +46,9 @@ export class Request {
           }
         }
         break;
+      case BodyType.ClearBlockFilter:
+        // No properties to serialize
+        break;
       case BodyType.Subscribe:
         // No properties to serialize
         break;
@@ -56,8 +61,12 @@ export class Request {
       case BodyType.GetBlock:
         buf.writeUint64(this.body.height);
         break;
-      case BodyType.GetBlockHeader:
+      case BodyType.GetFullBlock:
         buf.writeUint64(this.body.height);
+        break;
+      case BodyType.GetBlockRange:
+        buf.writeUint64(this.body.minHeight);
+        buf.writeUint64(this.body.maxHeight);
         break;
       case BodyType.GetAddressInfo:
         TypeSerializer.digest(buf, this.body.addr.bytes);
@@ -100,6 +109,12 @@ export class Request {
         };
         return new Request(id, req);
       }
+      case BodyType.ClearBlockFilter: {
+        const req: ClearBlockFilterReq = {
+          type: BodyType.ClearBlockFilter,
+        };
+        return new Request(id, req);
+      }
       case BodyType.Subscribe: {
         const req: SubscribeReq = {
           type: BodyType.Subscribe,
@@ -126,11 +141,21 @@ export class Request {
         };
         return new Request(id, req);
       }
-      case BodyType.GetBlockHeader: {
+      case BodyType.GetFullBlock: {
         const height = buf.readUint64();
-        const req: GetBlockHeaderReq = {
-          type: BodyType.GetBlockHeader,
+        const req: GetFullBlockReq = {
+          type: BodyType.GetFullBlock,
           height,
+        };
+        return new Request(id, req);
+      }
+      case BodyType.GetBlockRange: {
+        const minHeight = buf.readUint64();
+        const maxHeight = buf.readUint64();
+        const req: GetBlockRangeReq = {
+          type: BodyType.GetBlockRange,
+          minHeight,
+          maxHeight,
         };
         return new Request(id, req);
       }
@@ -157,8 +182,12 @@ export interface BroadcastReq {
 
 export interface SetBlockFilterReq {
   type: BodyType.SetBlockFilter;
-  /// Setting to undefined will remove any applied filter
+  /// Setting to undefined or an empty array will filter all addresses
   addrs: ScriptHash[] | undefined;
+}
+
+export interface ClearBlockFilterReq {
+  type: BodyType.ClearBlockFilter;
 }
 
 export interface SubscribeReq {
@@ -178,9 +207,15 @@ export interface GetBlockReq {
   height: Long;
 }
 
-export interface GetBlockHeaderReq {
-  type: BodyType.GetBlockHeader;
+export interface GetFullBlockReq {
+  type: BodyType.GetFullBlock;
   height: Long;
+}
+
+export interface GetBlockRangeReq {
+  type: BodyType.GetBlockRange;
+  minHeight: Long;
+  maxHeight: Long;
 }
 
 export interface GetAddressInfoReq {

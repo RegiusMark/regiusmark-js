@@ -57,6 +57,16 @@ test('serialize set block filter response', (): void => {
   expect(Response.deserialize(buf)).toStrictEqual(res);
 });
 
+test('serialize clear block filter response', (): void => {
+  const res = new Response(12345, {
+    type: BodyType.ClearBlockFilter,
+  });
+  const buf = ByteBuffer.alloc(128);
+  res.serialize(buf);
+  buf.resetOffset();
+  expect(Response.deserialize(buf)).toStrictEqual(res);
+});
+
 test('serialize subscribe response', (): void => {
   const res = new Response(0, {
     type: BodyType.Subscribe,
@@ -207,7 +217,7 @@ test('serialize get block filtered response', (): void => {
   expect(Response.deserialize(buf)).toStrictEqual(res);
 });
 
-test('serialize get block header response', (): void => {
+test('serialize get full block response', (): void => {
   const minter = generateKeyPair();
   const wallet = generateKeyPair();
 
@@ -229,22 +239,38 @@ test('serialize get block header response', (): void => {
   tx.sign(wallet);
   tx.sign(minter);
 
-  const header = new BlockHeader(
-    new BlockHeaderV0({
-      timestamp: Long.fromNumber(12345, true),
-      height: Long.fromNumber(12345, true),
-      previousHash: doubleSha256(new Uint8Array([1, 2, 3])),
-      txMerkleRoot: doubleSha256(new Uint8Array([4, 5, 6])),
-    }),
+  const block = new Block(
+    new BlockV0(
+      new BlockHeaderV0({
+        timestamp: Long.fromNumber(12345, true),
+        height: Long.fromNumber(12345, true),
+        previousHash: doubleSha256(new Uint8Array([1, 2, 3])),
+        txMerkleRoot: doubleSha256(new Uint8Array([4, 5, 6])),
+      }),
+      {
+        signer: undefined,
+        transactions: [tx],
+      },
+    ),
   );
-  const signer = minter.sign(header.calcHash());
+  block.sign(minter);
 
   const res = new Response(1, {
-    type: BodyType.GetBlockHeader,
-    header: [header, signer],
+    type: BodyType.GetFullBlock,
+    block,
   });
 
   const buf = ByteBuffer.alloc(4096);
+  res.serialize(buf);
+  buf.resetOffset();
+  expect(Response.deserialize(buf)).toStrictEqual(res);
+});
+
+test('serialize get block range response', (): void => {
+  const res = new Response(0, {
+    type: BodyType.GetBlockRange,
+  });
+  const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
   expect(Response.deserialize(buf)).toStrictEqual(res);

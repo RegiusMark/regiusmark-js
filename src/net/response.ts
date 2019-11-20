@@ -11,11 +11,13 @@ export type ResponseBody =
   | ErrorRes
   | BroadcastRes
   | SetBlockFilterRes
+  | ClearBlockFilterRes
   | SubscribeRes
   | UnsubscribeRes
   | GetPropertiesRes
   | GetBlockRes
-  | GetBlockHeaderRes
+  | GetFullBlockRes
+  | GetBlockRangeRes
   | GetAddressInfoRes;
 
 export class Response {
@@ -40,6 +42,8 @@ export class Response {
         break;
       case BodyType.SetBlockFilter:
         break;
+      case BodyType.ClearBlockFilter:
+        break;
       case BodyType.Subscribe:
         break;
       case BodyType.Unsubscribe:
@@ -62,9 +66,10 @@ export class Response {
           TypeSerializer.sigPair(buf, this.body.block[1]);
         }
         break;
-      case BodyType.GetBlockHeader:
-        this.body.header[0].serialize(buf);
-        TypeSerializer.sigPair(buf, this.body.header[1]);
+      case BodyType.GetFullBlock:
+        this.body.block.serialize(buf);
+        break;
+      case BodyType.GetBlockRange:
         break;
       case BodyType.GetAddressInfo: {
         const info = this.body.info;
@@ -102,6 +107,12 @@ export class Response {
       case BodyType.SetBlockFilter: {
         const body: SetBlockFilterRes = {
           type: BodyType.SetBlockFilter,
+        };
+        return new Response(id, body);
+      }
+      case BodyType.ClearBlockFilter: {
+        const body: ClearBlockFilterRes = {
+          type: BodyType.ClearBlockFilter,
         };
         return new Response(id, body);
       }
@@ -156,12 +167,17 @@ export class Response {
         };
         return new Response(id, body);
       }
-      case BodyType.GetBlockHeader: {
-        const header = BlockHeader.deserialize(buf);
-        const signer = TypeDeserializer.sigPair(buf);
-        const body: GetBlockHeaderRes = {
-          type: BodyType.GetBlockHeader,
-          header: [header, signer],
+      case BodyType.GetFullBlock: {
+        const block = Block.deserialize(buf);
+        const body: GetFullBlockRes = {
+          type: BodyType.GetFullBlock,
+          block,
+        };
+        return new Response(id, body);
+      }
+      case BodyType.GetBlockRange: {
+        const body: GetBlockRangeRes = {
+          type: BodyType.GetBlockRange,
         };
         return new Response(id, body);
       }
@@ -201,6 +217,10 @@ export interface SetBlockFilterRes {
   type: BodyType.SetBlockFilter;
 }
 
+export interface ClearBlockFilterRes {
+  type: BodyType.ClearBlockFilter;
+}
+
 export interface SubscribeRes {
   type: BodyType.Subscribe;
 }
@@ -219,9 +239,13 @@ export interface GetBlockRes {
   block: [BlockHeader, SigPair] | Block;
 }
 
-export interface GetBlockHeaderRes {
-  type: BodyType.GetBlockHeader;
-  header: [BlockHeader, SigPair];
+export interface GetFullBlockRes {
+  type: BodyType.GetFullBlock;
+  block: Block;
+}
+
+export interface GetBlockRangeRes {
+  type: BodyType.GetBlockRange;
 }
 
 export interface GetAddressInfoRes {
