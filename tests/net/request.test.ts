@@ -83,6 +83,17 @@ test('serialize set block filter request with no addresses', (): void => {
   expect(Request.deserialize(buf)).toStrictEqual(req);
 });
 
+test('serialize clear block filter request', (): void => {
+  const req = new Request(0, {
+    type: BodyType.ClearBlockFilter,
+  });
+
+  const buf = ByteBuffer.alloc(4096);
+  req.serialize(buf);
+  buf.resetOffset();
+  expect(Request.deserialize(buf)).toStrictEqual(req);
+});
+
 test('serialize subscribe request', (): void => {
   const req = new Request(0, {
     type: BodyType.Subscribe,
@@ -128,10 +139,23 @@ test('serialize get block request', (): void => {
   expect(Request.deserialize(buf)).toStrictEqual(req);
 });
 
-test('serialize get block header request', (): void => {
+test('serialize get full block request', (): void => {
   const req = new Request(0, {
-    type: BodyType.GetBlockHeader,
+    type: BodyType.GetFullBlock,
     height: Long.fromNumber(123, true),
+  });
+
+  const buf = ByteBuffer.alloc(4096);
+  req.serialize(buf);
+  buf.resetOffset();
+  expect(Request.deserialize(buf)).toStrictEqual(req);
+});
+
+test('serialize get block range request', (): void => {
+  const req = new Request(0, {
+    type: BodyType.GetBlockRange,
+    minHeight: Long.fromNumber(123, true),
+    maxHeight: Long.fromNumber(456, true),
   });
 
   const buf = ByteBuffer.alloc(4096);
