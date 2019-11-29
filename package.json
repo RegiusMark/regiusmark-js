@@ -1,6 +1,6 @@
 {
   "name": "godcoin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "GODcoin library",
   "repository": "https://github.com/GODcoin/godcoin-js",
   "author": "Samuel Grenier <samrg472@gmail.com>",

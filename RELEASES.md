@@ -1,10 +1,13 @@
 ## Releases
 
-# Unreleased
+# Version 0.2.0 (2019-11-29)
 
-- Update to latest network protocol. Implement message handling for
-  ClearBlockFilter, GetFullBlock, and GetBlockRange. The GetBlockHeader API has
-  been removed.
+This release updates to the latest networking protocol and allows eliminating an
+unnecessary round-trip RPC call when synchronizing blocks.
+
+- Implement message handling for ClearBlockFilter, GetFullBlock, and
+  GetBlockRange.
+- The GetBlockHeader API has been removed.
 
 ### Breaking changes
 
