@@ -4,87 +4,91 @@ import {
   TxVariant,
   BodyType,
   Asset,
-  Response,
-  NetworkError,
-  NetErrorKind,
   OwnerTxV0,
   Block,
   BlockV0,
   BlockHeaderV0,
   doubleSha256,
   BlockHeader,
+  Msg,
+  RpcType,
 } from '../../src';
 import Long from 'long';
 
-test('fail to deserialize invalid type id response', (): void => {
+test('fail to deserialize invalid response type id', (): void => {
   const buf = ByteBuffer.alloc(128)
     .writeUint32(0)
+    .writeUint8(BodyType.Response)
     .writeUint8(0xff)
     .resetOffset();
   expect((): void => {
-    Response.deserialize(buf);
-  }).toThrowError('unknown type id: 255');
-});
-
-test('serialize error response', (): void => {
-  const res = new Response(1234, {
-    type: BodyType.Error,
-    error: new NetworkError(NetErrorKind.Io),
-  });
-  const buf = ByteBuffer.alloc(128);
-  res.serialize(buf);
-  buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+    Msg.deserialize(buf);
+  }).toThrowError('unknown response id: 255');
 });
 
 test('serialize broadcast response', (): void => {
-  const res = new Response(0, {
-    type: BodyType.Broadcast,
+  const res = new Msg(0, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.Broadcast,
+    },
   });
   const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize set block filter response', (): void => {
-  const res = new Response(0, {
-    type: BodyType.SetBlockFilter,
+  const res = new Msg(0, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.SetBlockFilter,
+    },
   });
   const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize clear block filter response', (): void => {
-  const res = new Response(12345, {
-    type: BodyType.ClearBlockFilter,
+  const res = new Msg(12345, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.ClearBlockFilter,
+    },
   });
   const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize subscribe response', (): void => {
-  const res = new Response(0, {
-    type: BodyType.Subscribe,
+  const res = new Msg(0, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.Subscribe,
+    },
   });
   const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize unsubscribe response', (): void => {
-  const res = new Response(0, {
-    type: BodyType.Unsubscribe,
+  const res = new Msg(0, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.Unsubscribe,
+    },
   });
   const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize get properties response', (): void => {
@@ -109,20 +113,23 @@ test('serialize get properties response', (): void => {
   owner.sign(wallet);
   owner.sign(minter);
 
-  const res = new Response(0, {
-    type: BodyType.GetProperties,
-    properties: {
-      height: Long.fromNumber(123, true),
-      owner,
-      networkFee: Asset.fromString('1.12345 MARK'),
-      tokenSupply: Asset.fromString('123456.00000 MARK'),
+  const res = new Msg(0, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.GetProperties,
+      properties: {
+        height: Long.fromNumber(123, true),
+        owner,
+        networkFee: Asset.fromString('1.12345 MARK'),
+        tokenSupply: Asset.fromString('123456.00000 MARK'),
+      },
     },
   });
 
   const buf = ByteBuffer.alloc(128);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize get block response', (): void => {
@@ -163,15 +170,18 @@ test('serialize get block response', (): void => {
   );
   block.sign(minter);
 
-  const res = new Response(1, {
-    type: BodyType.GetBlock,
-    block,
+  const res = new Msg(1, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.GetBlock,
+      block,
+    },
   });
 
   const buf = ByteBuffer.alloc(4096);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize get block filtered response', (): void => {
@@ -206,15 +216,18 @@ test('serialize get block filtered response', (): void => {
   );
   const signer = minter.sign(header.calcHash());
 
-  const res = new Response(1, {
-    type: BodyType.GetBlock,
-    block: [header, signer],
+  const res = new Msg(1, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.GetBlock,
+      block: [header, signer],
+    },
   });
 
   const buf = ByteBuffer.alloc(4096);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });
 
 test('serialize get full block response', (): void => {
@@ -255,39 +268,48 @@ test('serialize get full block response', (): void => {
   );
   block.sign(minter);
 
-  const res = new Response(1, {
-    type: BodyType.GetFullBlock,
-    block,
-  });
-
-  const buf = ByteBuffer.alloc(4096);
-  res.serialize(buf);
-  buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
-});
-
-test('serialize get block range response', (): void => {
-  const res = new Response(0, {
-    type: BodyType.GetBlockRange,
-  });
-  const buf = ByteBuffer.alloc(128);
-  res.serialize(buf);
-  buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
-});
-
-test('serialize get address info response', (): void => {
-  const res = new Response(2, {
-    type: BodyType.GetAddressInfo,
-    info: {
-      netFee: Asset.fromString('1.00000 MARK'),
-      addrFee: Asset.fromString('0.00010 MARK'),
-      balance: Asset.fromString('100000000.00000 MARK'),
+  const res = new Msg(1, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.GetFullBlock,
+      block,
     },
   });
 
   const buf = ByteBuffer.alloc(4096);
   res.serialize(buf);
   buf.resetOffset();
-  expect(Response.deserialize(buf)).toStrictEqual(res);
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
+});
+
+test('serialize get block range response', (): void => {
+  const res = new Msg(0, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.GetBlockRange,
+    },
+  });
+  const buf = ByteBuffer.alloc(128);
+  res.serialize(buf);
+  buf.resetOffset();
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
+});
+
+test('serialize get address info response', (): void => {
+  const res = new Msg(2, {
+    type: BodyType.Response,
+    res: {
+      type: RpcType.GetAddressInfo,
+      info: {
+        netFee: Asset.fromString('1.00000 MARK'),
+        addrFee: Asset.fromString('0.00010 MARK'),
+        balance: Asset.fromString('100000000.00000 MARK'),
+      },
+    },
+  });
+
+  const buf = ByteBuffer.alloc(4096);
+  res.serialize(buf);
+  buf.resetOffset();
+  expect(Msg.deserialize(buf)).toStrictEqual(res);
 });

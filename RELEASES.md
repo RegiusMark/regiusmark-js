@@ -1,5 +1,13 @@
 ## Releases
 
+# Unreleased
+
+- The network protocol now supports ping/pong at the application level.
+
+### Breaking changes
+
+- Update the networking protocol to support message decoupling from RPC.
+
 # Version 0.2.0 (2019-11-29)
 
 This release updates to the latest networking protocol and allows eliminating an

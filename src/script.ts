@@ -116,8 +116,8 @@ export class ScriptEvalError extends Error {
         this.message = 'stack underflow';
         break;
       default:
-        const _exhaustiveCHeck: never = this.kind;
-        throw new Error(_exhaustiveCHeck);
+        const _exhaustiveCheck: never = this.kind;
+        throw new Error(_exhaustiveCheck);
     }
     this.message += ' (pos: ' + this.position + ')';
   }
