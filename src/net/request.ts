@@ -2,10 +2,10 @@ import { TypeSerializer, TypeDeserializer } from '../serializer';
 import { ByteBuffer } from '../bytebuffer';
 import { ScriptHash } from '../crypto';
 import { TxVariant } from '../tx';
-import { BodyType } from '.';
+import { RpcType } from '.';
 import Long from 'long';
 
-export type RequestBody =
+export type Request =
   | BroadcastReq
   | SetBlockFilterReq
   | ClearBlockFilterReq
@@ -17,208 +17,191 @@ export type RequestBody =
   | GetBlockRangeReq
   | GetAddressInfoReq;
 
-export class Request {
-  /// A 32-bit unsigned integer max value is reserved for deserialization errors that occur during request processing.
-  /// When a request is received with a reserved id, an IO error is returned regardless if the request is valid.
-  public id: number;
-  public body: RequestBody;
-
-  public constructor(id: number, body: RequestBody) {
-    this.id = id;
-    this.body = body;
-  }
-
-  public serialize(buf: ByteBuffer): void {
-    buf.writeUint32(this.id);
-    buf.writeUint8(this.body.type);
-    switch (this.body.type) {
-      case BodyType.Broadcast:
-        this.body.tx.serialize(buf);
-        break;
-      case BodyType.SetBlockFilter:
-        if (!this.body.addrs) {
-          // No addresses (len)
-          buf.writeUint8(0);
-        } else {
-          buf.writeUint8(this.body.addrs.length);
-          for (const addr of this.body.addrs) {
-            TypeSerializer.digest(buf, addr.bytes);
-          }
-        }
-        break;
-      case BodyType.ClearBlockFilter:
-        // No properties to serialize
-        break;
-      case BodyType.Subscribe:
-        // No properties to serialize
-        break;
-      case BodyType.Unsubscribe:
-        // No properties to serialize
-        break;
-      case BodyType.GetProperties:
-        // No properties to serialize
-        break;
-      case BodyType.GetBlock:
-        buf.writeUint64(this.body.height);
-        break;
-      case BodyType.GetFullBlock:
-        buf.writeUint64(this.body.height);
-        break;
-      case BodyType.GetBlockRange:
-        buf.writeUint64(this.body.minHeight);
-        buf.writeUint64(this.body.maxHeight);
-        break;
-      case BodyType.GetAddressInfo:
-        TypeSerializer.digest(buf, this.body.addr.bytes);
-        break;
-      /* istanbul ignore next */
-      default:
-        const _exhaustiveCheck: never = this.body;
-        throw new Error(_exhaustiveCheck);
-    }
-  }
-
-  public static deserialize(buf: ByteBuffer): Request {
-    const id = buf.readUint32();
-    const type = buf.readUint8() as BodyType;
-    if (!(type in BodyType)) throw new Error('unknown type id: ' + type);
-    switch (type) {
-      case BodyType.Error: {
-        throw new Error('cannot deserialize error requests');
-      }
-      case BodyType.Broadcast: {
-        const tx = TxVariant.deserialize(buf);
-        const req: BroadcastReq = {
-          type: BodyType.Broadcast,
-          tx,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.SetBlockFilter: {
-        const addrLen = buf.readUint8();
-        let addrs: ScriptHash[] | undefined;
-        if (addrLen > 0) {
-          addrs = [];
-          for (let i = 0; i < addrLen; ++i) {
-            addrs.push(new ScriptHash(TypeDeserializer.digest(buf)));
-          }
-        }
-        const req: SetBlockFilterReq = {
-          type: BodyType.SetBlockFilter,
-          addrs,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.ClearBlockFilter: {
-        const req: ClearBlockFilterReq = {
-          type: BodyType.ClearBlockFilter,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.Subscribe: {
-        const req: SubscribeReq = {
-          type: BodyType.Subscribe,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.Unsubscribe: {
-        const req: UnsubscribeReq = {
-          type: BodyType.Unsubscribe,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.GetProperties: {
-        const req: GetPropertiesReq = {
-          type: BodyType.GetProperties,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.GetBlock: {
-        const height = buf.readUint64();
-        const req: GetBlockReq = {
-          type: BodyType.GetBlock,
-          height,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.GetFullBlock: {
-        const height = buf.readUint64();
-        const req: GetFullBlockReq = {
-          type: BodyType.GetFullBlock,
-          height,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.GetBlockRange: {
-        const minHeight = buf.readUint64();
-        const maxHeight = buf.readUint64();
-        const req: GetBlockRangeReq = {
-          type: BodyType.GetBlockRange,
-          minHeight,
-          maxHeight,
-        };
-        return new Request(id, req);
-      }
-      case BodyType.GetAddressInfo: {
-        const addr = new ScriptHash(TypeDeserializer.digest(buf));
-        const req: GetAddressInfoReq = {
-          type: BodyType.GetAddressInfo,
-          addr,
-        };
-        return new Request(id, req);
-      }
-      /* istanbul ignore next */
-      default:
-        const _exhaustiveCheck: never = type;
-        throw new Error(_exhaustiveCheck);
-    }
-  }
-}
-
 export interface BroadcastReq {
-  type: BodyType.Broadcast;
+  type: RpcType.Broadcast;
   tx: TxVariant;
 }
 
 export interface SetBlockFilterReq {
-  type: BodyType.SetBlockFilter;
+  type: RpcType.SetBlockFilter;
   /// Setting to undefined or an empty array will filter all addresses
   addrs: ScriptHash[] | undefined;
 }
 
 export interface ClearBlockFilterReq {
-  type: BodyType.ClearBlockFilter;
+  type: RpcType.ClearBlockFilter;
 }
 
 export interface SubscribeReq {
-  type: BodyType.Subscribe;
+  type: RpcType.Subscribe;
 }
 
 export interface UnsubscribeReq {
-  type: BodyType.Unsubscribe;
+  type: RpcType.Unsubscribe;
 }
 
 export interface GetPropertiesReq {
-  type: BodyType.GetProperties;
+  type: RpcType.GetProperties;
 }
 
 export interface GetBlockReq {
-  type: BodyType.GetBlock;
+  type: RpcType.GetBlock;
   height: Long;
 }
 
 export interface GetFullBlockReq {
-  type: BodyType.GetFullBlock;
+  type: RpcType.GetFullBlock;
   height: Long;
 }
 
 export interface GetBlockRangeReq {
-  type: BodyType.GetBlockRange;
+  type: RpcType.GetBlockRange;
   minHeight: Long;
   maxHeight: Long;
 }
 
 export interface GetAddressInfoReq {
-  type: BodyType.GetAddressInfo;
+  type: RpcType.GetAddressInfo;
   addr: ScriptHash;
+}
+
+export function serializeReq(buf: ByteBuffer, req: Request): void {
+  buf.writeUint8(req.type);
+  switch (req.type) {
+    case RpcType.Broadcast:
+      req.tx.serialize(buf);
+      break;
+    case RpcType.SetBlockFilter:
+      if (!req.addrs) {
+        // No addresses (len)
+        buf.writeUint8(0);
+      } else {
+        buf.writeUint8(req.addrs.length);
+        for (const addr of req.addrs) {
+          TypeSerializer.digest(buf, addr.bytes);
+        }
+      }
+      break;
+    case RpcType.ClearBlockFilter:
+      // No properties to serialize
+      break;
+    case RpcType.Subscribe:
+      // No properties to serialize
+      break;
+    case RpcType.Unsubscribe:
+      // No properties to serialize
+      break;
+    case RpcType.GetProperties:
+      // No properties to serialize
+      break;
+    case RpcType.GetBlock:
+      buf.writeUint64(req.height);
+      break;
+    case RpcType.GetFullBlock:
+      buf.writeUint64(req.height);
+      break;
+    case RpcType.GetBlockRange:
+      buf.writeUint64(req.minHeight);
+      buf.writeUint64(req.maxHeight);
+      break;
+    case RpcType.GetAddressInfo:
+      TypeSerializer.digest(buf, req.addr.bytes);
+      break;
+    /* istanbul ignore next */
+    default:
+      const _exhaustiveCheck: never = req;
+      throw new Error(_exhaustiveCheck);
+  }
+}
+
+export function deserializeReq(buf: ByteBuffer): Request {
+  const type = buf.readUint8() as RpcType;
+  if (!(type in RpcType)) throw new Error('unknown request id: ' + type);
+  switch (type) {
+    case RpcType.Broadcast: {
+      const tx = TxVariant.deserialize(buf);
+      const req: BroadcastReq = {
+        type: RpcType.Broadcast,
+        tx,
+      };
+      return req;
+    }
+    case RpcType.SetBlockFilter: {
+      const addrLen = buf.readUint8();
+      let addrs: ScriptHash[] | undefined;
+      if (addrLen > 0) {
+        addrs = [];
+        for (let i = 0; i < addrLen; ++i) {
+          addrs.push(new ScriptHash(TypeDeserializer.digest(buf)));
+        }
+      }
+      const req: SetBlockFilterReq = {
+        type: RpcType.SetBlockFilter,
+        addrs,
+      };
+      return req;
+    }
+    case RpcType.ClearBlockFilter: {
+      const req: ClearBlockFilterReq = {
+        type: RpcType.ClearBlockFilter,
+      };
+      return req;
+    }
+    case RpcType.Subscribe: {
+      const req: SubscribeReq = {
+        type: RpcType.Subscribe,
+      };
+      return req;
+    }
+    case RpcType.Unsubscribe: {
+      const req: UnsubscribeReq = {
+        type: RpcType.Unsubscribe,
+      };
+      return req;
+    }
+    case RpcType.GetProperties: {
+      const req: GetPropertiesReq = {
+        type: RpcType.GetProperties,
+      };
+      return req;
+    }
+    case RpcType.GetBlock: {
+      const height = buf.readUint64();
+      const req: GetBlockReq = {
+        type: RpcType.GetBlock,
+        height,
+      };
+      return req;
+    }
+    case RpcType.GetFullBlock: {
+      const height = buf.readUint64();
+      const req: GetFullBlockReq = {
+        type: RpcType.GetFullBlock,
+        height,
+      };
+      return req;
+    }
+    case RpcType.GetBlockRange: {
+      const minHeight = buf.readUint64();
+      const maxHeight = buf.readUint64();
+      const req: GetBlockRangeReq = {
+        type: RpcType.GetBlockRange,
+        minHeight,
+        maxHeight,
+      };
+      return req;
+    }
+    case RpcType.GetAddressInfo: {
+      const addr = new ScriptHash(TypeDeserializer.digest(buf));
+      const req: GetAddressInfoReq = {
+        type: RpcType.GetAddressInfo,
+        addr,
+      };
+      return req;
+    }
+    /* istanbul ignore next */
+    default:
+      const _exhaustiveCheck: never = type;
+      throw new Error(_exhaustiveCheck);
+  }
 }

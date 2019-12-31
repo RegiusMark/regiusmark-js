@@ -3,12 +3,10 @@ import { ChainProperties, AddressInfo } from '../chain';
 import { BlockHeader, Block } from '../block';
 import { ByteBuffer } from '../bytebuffer';
 import { TxVariant, TxType } from '../tx';
-import { NetworkError } from './error';
 import { SigPair } from '../crypto';
-import { BodyType } from '.';
+import { RpcType } from '.';
 
-export type ResponseBody =
-  | ErrorRes
+export type Response =
   | BroadcastRes
   | SetBlockFilterRes
   | ClearBlockFilterRes
@@ -20,235 +18,205 @@ export type ResponseBody =
   | GetBlockRangeRes
   | GetAddressInfoRes;
 
-export class Response {
-  /// A 32-bit unsigned integer max value represents an IO error during processing the request. Note that sending a
-  /// request with a max value will be treated as an IO error regardless if the request is valid.
-  public id: number;
-  public body: ResponseBody;
-
-  public constructor(id: number, body: ResponseBody) {
-    this.id = id;
-    this.body = body;
-  }
-
-  public serialize(buf: ByteBuffer): void {
-    buf.writeUint32(this.id);
-    buf.writeUint8(this.body.type);
-    switch (this.body.type) {
-      case BodyType.Error:
-        this.body.error.serialize(buf);
-        break;
-      case BodyType.Broadcast:
-        break;
-      case BodyType.SetBlockFilter:
-        break;
-      case BodyType.ClearBlockFilter:
-        break;
-      case BodyType.Subscribe:
-        break;
-      case BodyType.Unsubscribe:
-        break;
-      case BodyType.GetProperties: {
-        const props = this.body.properties;
-        buf.writeUint64(props.height);
-        props.owner.serialize(buf);
-        TypeSerializer.asset(buf, props.networkFee);
-        TypeSerializer.asset(buf, props.tokenSupply);
-        break;
-      }
-      case BodyType.GetBlock:
-        if (this.body.block instanceof Block) {
-          buf.writeUint8(1);
-          this.body.block.serialize(buf);
-        } else {
-          buf.writeUint8(0);
-          this.body.block[0].serialize(buf);
-          TypeSerializer.sigPair(buf, this.body.block[1]);
-        }
-        break;
-      case BodyType.GetFullBlock:
-        this.body.block.serialize(buf);
-        break;
-      case BodyType.GetBlockRange:
-        break;
-      case BodyType.GetAddressInfo: {
-        const info = this.body.info;
-        TypeSerializer.asset(buf, info.netFee);
-        TypeSerializer.asset(buf, info.addrFee);
-        TypeSerializer.asset(buf, info.balance);
-        break;
-      }
-      /* istanbul ignore next */
-      default:
-        const _exhaustiveCheck: never = this.body;
-        return _exhaustiveCheck;
-    }
-  }
-
-  public static deserialize(buf: ByteBuffer): Response {
-    const id = buf.readUint32();
-    const type = buf.readUint8() as BodyType;
-    if (!(type in BodyType)) throw new Error('unknown type id: ' + type);
-    switch (type) {
-      case BodyType.Error: {
-        const error = NetworkError.deserialize(buf);
-        const body: ErrorRes = {
-          type: BodyType.Error,
-          error,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.Broadcast: {
-        const body: BroadcastRes = {
-          type: BodyType.Broadcast,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.SetBlockFilter: {
-        const body: SetBlockFilterRes = {
-          type: BodyType.SetBlockFilter,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.ClearBlockFilter: {
-        const body: ClearBlockFilterRes = {
-          type: BodyType.ClearBlockFilter,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.Subscribe: {
-        const body: SubscribeRes = {
-          type: BodyType.Subscribe,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.Unsubscribe: {
-        const body: UnsubscribeRes = {
-          type: BodyType.Unsubscribe,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.GetProperties: {
-        const height = buf.readUint64();
-        const owner = TxVariant.deserialize(buf);
-        if (owner.tx.type !== TxType.OWNER) {
-          throw new Error('expected owner tx');
-        }
-        const networkFee = TypeDeserializer.asset(buf);
-        const tokenSupply = TypeDeserializer.asset(buf);
-
-        const body: GetPropertiesRes = {
-          type: BodyType.GetProperties,
-          properties: {
-            height,
-            owner,
-            networkFee,
-            tokenSupply,
-          },
-        };
-
-        return new Response(id, body);
-      }
-      case BodyType.GetBlock: {
-        const filteredBlockType = buf.readUint8();
-        let filteredBlock: [BlockHeader, SigPair] | Block;
-        if (filteredBlockType === 0) {
-          const header = BlockHeader.deserialize(buf);
-          const signer = TypeDeserializer.sigPair(buf);
-          filteredBlock = [header, signer];
-        } else if (filteredBlockType === 1) {
-          filteredBlock = Block.deserialize(buf);
-        } else {
-          throw new Error('invalid filtered block type');
-        }
-        const body: GetBlockRes = {
-          type: BodyType.GetBlock,
-          block: filteredBlock,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.GetFullBlock: {
-        const block = Block.deserialize(buf);
-        const body: GetFullBlockRes = {
-          type: BodyType.GetFullBlock,
-          block,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.GetBlockRange: {
-        const body: GetBlockRangeRes = {
-          type: BodyType.GetBlockRange,
-        };
-        return new Response(id, body);
-      }
-      case BodyType.GetAddressInfo: {
-        const netFee = TypeDeserializer.asset(buf);
-        const addrFee = TypeDeserializer.asset(buf);
-        const balance = TypeDeserializer.asset(buf);
-        const info: AddressInfo = {
-          netFee,
-          addrFee,
-          balance,
-        };
-        const body: GetAddressInfoRes = {
-          type: BodyType.GetAddressInfo,
-          info,
-        };
-        return new Response(id, body);
-      }
-      /* istanbul ignore next */
-      default:
-        const _exhaustiveCheck: never = type;
-        return _exhaustiveCheck;
-    }
-  }
-}
-
-export interface ErrorRes {
-  type: BodyType.Error;
-  error: NetworkError;
-}
-
 export interface BroadcastRes {
-  type: BodyType.Broadcast;
+  type: RpcType.Broadcast;
 }
 
 export interface SetBlockFilterRes {
-  type: BodyType.SetBlockFilter;
+  type: RpcType.SetBlockFilter;
 }
 
 export interface ClearBlockFilterRes {
-  type: BodyType.ClearBlockFilter;
+  type: RpcType.ClearBlockFilter;
 }
 
 export interface SubscribeRes {
-  type: BodyType.Subscribe;
+  type: RpcType.Subscribe;
 }
 
 export interface UnsubscribeRes {
-  type: BodyType.Unsubscribe;
+  type: RpcType.Unsubscribe;
 }
 
 export interface GetPropertiesRes {
-  type: BodyType.GetProperties;
+  type: RpcType.GetProperties;
   properties: ChainProperties;
 }
 
 export interface GetBlockRes {
-  type: BodyType.GetBlock;
+  type: RpcType.GetBlock;
   block: [BlockHeader, SigPair] | Block;
 }
 
 export interface GetFullBlockRes {
-  type: BodyType.GetFullBlock;
+  type: RpcType.GetFullBlock;
   block: Block;
 }
 
 export interface GetBlockRangeRes {
-  type: BodyType.GetBlockRange;
+  type: RpcType.GetBlockRange;
 }
 
 export interface GetAddressInfoRes {
-  type: BodyType.GetAddressInfo;
+  type: RpcType.GetAddressInfo;
   info: AddressInfo;
+}
+
+export function serializeRes(buf: ByteBuffer, res: Response): void {
+  buf.writeUint8(res.type);
+  switch (res.type) {
+    case RpcType.Broadcast:
+      break;
+    case RpcType.SetBlockFilter:
+      break;
+    case RpcType.ClearBlockFilter:
+      break;
+    case RpcType.Subscribe:
+      break;
+    case RpcType.Unsubscribe:
+      break;
+    case RpcType.GetProperties: {
+      const props = res.properties;
+      buf.writeUint64(props.height);
+      props.owner.serialize(buf);
+      TypeSerializer.asset(buf, props.networkFee);
+      TypeSerializer.asset(buf, props.tokenSupply);
+      break;
+    }
+    case RpcType.GetBlock:
+      if (res.block instanceof Block) {
+        buf.writeUint8(1);
+        res.block.serialize(buf);
+      } else {
+        buf.writeUint8(0);
+        res.block[0].serialize(buf);
+        TypeSerializer.sigPair(buf, res.block[1]);
+      }
+      break;
+    case RpcType.GetFullBlock:
+      res.block.serialize(buf);
+      break;
+    case RpcType.GetBlockRange:
+      break;
+    case RpcType.GetAddressInfo: {
+      const info = res.info;
+      TypeSerializer.asset(buf, info.netFee);
+      TypeSerializer.asset(buf, info.addrFee);
+      TypeSerializer.asset(buf, info.balance);
+      break;
+    }
+    /* istanbul ignore next */
+    default:
+      const _exhaustiveCheck: never = res;
+      throw new Error(_exhaustiveCheck);
+  }
+}
+
+export function deserializeRes(buf: ByteBuffer): Response {
+  const type = buf.readUint8() as RpcType;
+  if (!(type in RpcType)) throw new Error('unknown response id: ' + type);
+  switch (type) {
+    case RpcType.Broadcast: {
+      const body: BroadcastRes = {
+        type: RpcType.Broadcast,
+      };
+      return body;
+    }
+    case RpcType.SetBlockFilter: {
+      const body: SetBlockFilterRes = {
+        type: RpcType.SetBlockFilter,
+      };
+      return body;
+    }
+    case RpcType.ClearBlockFilter: {
+      const body: ClearBlockFilterRes = {
+        type: RpcType.ClearBlockFilter,
+      };
+      return body;
+    }
+    case RpcType.Subscribe: {
+      const body: SubscribeRes = {
+        type: RpcType.Subscribe,
+      };
+      return body;
+    }
+    case RpcType.Unsubscribe: {
+      const body: UnsubscribeRes = {
+        type: RpcType.Unsubscribe,
+      };
+      return body;
+    }
+    case RpcType.GetProperties: {
+      const height = buf.readUint64();
+      const owner = TxVariant.deserialize(buf);
+      if (owner.tx.type !== TxType.OWNER) {
+        throw new Error('expected owner tx');
+      }
+      const networkFee = TypeDeserializer.asset(buf);
+      const tokenSupply = TypeDeserializer.asset(buf);
+
+      const body: GetPropertiesRes = {
+        type: RpcType.GetProperties,
+        properties: {
+          height,
+          owner,
+          networkFee,
+          tokenSupply,
+        },
+      };
+
+      return body;
+    }
+    case RpcType.GetBlock: {
+      const filteredBlockType = buf.readUint8();
+      let filteredBlock: [BlockHeader, SigPair] | Block;
+      if (filteredBlockType === 0) {
+        const header = BlockHeader.deserialize(buf);
+        const signer = TypeDeserializer.sigPair(buf);
+        filteredBlock = [header, signer];
+      } else if (filteredBlockType === 1) {
+        filteredBlock = Block.deserialize(buf);
+      } else {
+        throw new Error('invalid filtered block type: ' + filteredBlockType);
+      }
+      const body: GetBlockRes = {
+        type: RpcType.GetBlock,
+        block: filteredBlock,
+      };
+      return body;
+    }
+    case RpcType.GetFullBlock: {
+      const block = Block.deserialize(buf);
+      const body: GetFullBlockRes = {
+        type: RpcType.GetFullBlock,
+        block,
+      };
+      return body;
+    }
+    case RpcType.GetBlockRange: {
+      const body: GetBlockRangeRes = {
+        type: RpcType.GetBlockRange,
+      };
+      return body;
+    }
+    case RpcType.GetAddressInfo: {
+      const netFee = TypeDeserializer.asset(buf);
+      const addrFee = TypeDeserializer.asset(buf);
+      const balance = TypeDeserializer.asset(buf);
+      const info: AddressInfo = {
+        netFee,
+        addrFee,
+        balance,
+      };
+      const body: GetAddressInfoRes = {
+        type: RpcType.GetAddressInfo,
+        info,
+      };
+      return body;
+    }
+    /* istanbul ignore next */
+    default:
+      const _exhaustiveCheck: never = type;
+      throw new Error(_exhaustiveCheck);
+  }
 }
