@@ -1,6 +1,6 @@
 ## Releases
 
-# Unreleased
+# Version 0.3.0 (2019-12-31)
 
 - The network protocol now supports ping/pong at the application level.
 
